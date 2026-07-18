@@ -2,8 +2,10 @@
 
 namespace sistema\controlador;
 
-use sistema\modelo\MaquinaModelo;
+use sistema\modelo\Maquina;
 use sistema\modelo\Layout;
+use sistema\modelo\LayoutMaquina;
+use sistema\modelo\Producao;
 use sistema\nucleo\Controlador;
 use sistema\nucleo\Helpers;
 
@@ -27,7 +29,7 @@ class SiteControlador extends Controlador
     {
         echo $this->template->rendenrizar('sobre.html',
         [
-            'dados' => (new MaquinaModelo())->buscarMaq()
+            'dados' => (new Maquina())->buscarMaq()
         ]);
     }
 
@@ -58,7 +60,7 @@ class SiteControlador extends Controlador
         $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
         if (!empty($dados)) {
             
-            (new MaquinaModelo)->cadastrarMaquina($dados);
+            (new Maquina)->cadastrarMaquina($dados);
             // Para validações posteriormente
             // foreach ($dados as $key => $value) 
             //{
@@ -80,13 +82,13 @@ class SiteControlador extends Controlador
     {   
          $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
          if (!empty($dados)) {
-           //var_dump((new MaquinaModelo)->montarLayout($id, $dados));
-           (new MaquinaModelo)->montarLayout($id, $dados);
+           //var_dump((new Maquina)->montarLayout($id, $dados));
+           (new LayoutMaquina)->montarLayout($id, $dados);
         }
           
         echo $this->template->rendenrizar('cadastrolayout.html',
         [
-            'maquinas' => (new MaquinaModelo)->buscarMaq(),
+            'maquinas' => (new Maquina)->buscarMaq(),
             'layouts' => (new Layout)->filtrarLayout($id)
         ]);
     }
@@ -95,12 +97,12 @@ class SiteControlador extends Controlador
     {             
         $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
         if (!empty($dados)) {
-            (new MaquinaModelo)->guardarProducao($layout,$dados);
+            (new Producao)->guardarProducao($layout,$dados);
         }
         
         echo $this->template->rendenrizar('producao.html', 
         [
-            'maquinas' => (new MaquinaModelo)->buscarLayout_Machine($layout),
+            'maquinas' => (new LayoutMaquina)->buscarLayout_Machine($layout),
             'DATA_ATUAL' => DATA_ATUAL
         ]);
     }
@@ -124,7 +126,7 @@ class SiteControlador extends Controlador
         //$id = filter_input(INPUT_POST, FILTER_DEFAULT);
 
         if (!empty($id)) {
-            (new MaquinaModelo)->deletar($id);
+            (new Layout)->deletar($id);
         }
 
         Helpers::redirecionar('layouts');

@@ -35,4 +35,10 @@ class Layout extends Modelo
 
     return $this->conection->select($query);
   }
+
+  public function deletar(string $id): void
+  {
+    $query = "DELETE FROM layout WHERE id_layout = $id";
+    $this->conection->delete($query);
+  }
 }
