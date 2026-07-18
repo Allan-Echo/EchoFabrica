@@ -36,6 +36,7 @@ class Layout extends Modelo
     return $this->conection->select($query);
   }
 
+  //Analisar como seria para deletar, pois o layout está vinculado em outras tabelas
   public function deletar(string $id): void
   {
     $query = "DELETE FROM layout WHERE id_layout = $id";

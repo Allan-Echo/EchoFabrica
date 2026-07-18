@@ -25,6 +25,8 @@ try {
 
     // Rotas para Layouts
     SimpleRouter::group([], function() {
+
+        //SimpleRouter::match(['get', 'post'], BASE_ROUTE . 'layouts/{layout}/producao', 'SiteControlador@producao');
         
         SimpleRouter::match(['get', 'post'], BASE_ROUTE . 'layouts/montar/{id}', 'SiteControlador@montarLayout');
 

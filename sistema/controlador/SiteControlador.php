@@ -121,6 +121,7 @@ class SiteControlador extends Controlador
         ]);
     }
 
+    //Analisar como seria para deletar, pois o layout está vinculado em outras tabelas
     public function deletar($id): void
     {
         //$id = filter_input(INPUT_POST, FILTER_DEFAULT);
