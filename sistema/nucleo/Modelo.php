@@ -4,11 +4,12 @@ namespace sistema\nucleo;
 
 use sistema\nucleo\suporte\EasyPDO;
 
-class ControladorDB
+abstract class Modelo
 {
     protected EasyPDO $conection;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->conection = new EasyPDO();
     }
 }

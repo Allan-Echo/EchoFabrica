@@ -3,6 +3,7 @@
 namespace sistema\controlador;
 
 use sistema\modelo\MaquinaModelo;
+use sistema\modelo\Layout;
 use sistema\nucleo\Controlador;
 use sistema\nucleo\Helpers;
 
@@ -86,7 +87,7 @@ class SiteControlador extends Controlador
         echo $this->template->rendenrizar('cadastrolayout.html',
         [
             'maquinas' => (new MaquinaModelo)->buscarMaq(),
-            'layouts' => (new MaquinaModelo)->filtrarLayout($id)
+            'layouts' => (new Layout)->filtrarLayout($id)
         ]);
     }
 
@@ -108,12 +109,12 @@ class SiteControlador extends Controlador
     {
         $dados = filter_input_array(INPUT_POST,FILTER_DEFAULT);
         if (!empty($dados)) {
-            (new MaquinaModelo)->cadastrarLayout($dados);
+            (new Layout)->cadastrarLayout($dados);
         }
 
         echo $this->template->rendenrizar('layouts.html',
         [
-            'layouts' => (new MaquinaModelo)->listarLayout(),
+            'layouts' => (new Layout)->buscarLayout(),
             'URL_DEV' => URL_DEV
         ]);
     }
