@@ -11,32 +11,35 @@ use sistema\nucleo\Helpers;
 
 class SiteControlador extends Controlador
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct('templates/site/views');
     }
 
-    public function erro404() :void
+    public function erro404(): void
     {
-        echo $this->template->rendenrizar('404.html',[]);
-    }
-    
-    public function index() :void
-    {
-        echo $this->template->rendenrizar('index.html',[]);
+        echo $this->template->rendenrizar('404.html', []);
     }
 
-    public function sobre() :void
+    public function index(): void
     {
-        echo $this->template->rendenrizar('sobre.html',
-        [
-            'dados' => (new Maquina())->buscarMaq()
-        ]);
+        echo $this->template->rendenrizar('index.html', []);
+    }
+
+    public function sobre(): void
+    {
+        echo $this->template->rendenrizar(
+            'sobre.html',
+            [
+                'dados' => (new Maquina())->buscarMaq()
+            ]
+        );
     }
 
     // public function post($dado = null) :void
     // {
     //      $modelo = (new MaquinaModelo())->filtrar($dado);
-        
+
     //      if(!$modelo) {
     //          Helpers::redirecionar('404');
     //      }
@@ -57,9 +60,9 @@ class SiteControlador extends Controlador
 
     public function cadastroMaq(): void
     {
-        $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
+        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
-            
+
             (new Maquina)->cadastrarMaquina($dados);
             // Para validações posteriormente
             // foreach ($dados as $key => $value) 
@@ -70,61 +73,67 @@ class SiteControlador extends Controlador
             //             die('Campos Obrigatórios em branco');
             //         } else {die ('enviado com sucesso');}
             //     } 
-           // }
-        }                
-         echo $this->template->rendenrizar('cadastromaquina.html',
-         [
-        
-         ]);
+            // }
+        }
+        echo $this->template->rendenrizar(
+            'cadastromaquina.html',
+            []
+        );
     }
 
     public function montarLayout($id): void
-    {   
-         $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
-         if (!empty($dados)) {
-           //var_dump((new Maquina)->montarLayout($id, $dados));
-           (new LayoutMaquina)->montarLayout($id, $dados);
+    {
+        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
+        if (!empty($dados)) {
+            //var_dump((new Maquina)->montarLayout($id, $dados));
+            (new LayoutMaquina)->montarLayout($id, $dados);
         }
-          
-        echo $this->template->rendenrizar('cadastrolayout.html',
-        [
-            'maquinas' => (new Maquina)->buscarMaq(),
-            'layouts' => (new Layout)->filtrarLayout($id)
-        ]);
+
+        echo $this->template->rendenrizar(
+            'cadastrolayout.html',
+            [
+                'maquinas' => (new Maquina)->buscarMaq(),
+                'layouts' => (new Layout)->filtrarLayout($id)
+            ]
+        );
     }
 
     public function produção($layout): void
-    {             
-        $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
+    {
+        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
-            (new Producao)->guardarProducao($layout,$dados);
+            (new Producao)->guardarProducao($layout, $dados);
         }
-        
-        echo $this->template->rendenrizar('producao.html', 
-        [
-            'maquinas' => (new LayoutMaquina)->buscarLayout_Machine($layout),
-            'DATA_ATUAL' => DATA_ATUAL
-        ]);
+
+        echo $this->template->rendenrizar(
+            'producao.html',
+            [
+                'maquinas' => (new LayoutMaquina)->buscarLayout_Machine($layout),
+                'DATA_ATUAL' => DATA_ATUAL
+            ]
+        );
     }
 
     public function layouts(): void
     {
-        $dados = filter_input_array(INPUT_POST,FILTER_DEFAULT);
+        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
             (new Layout)->cadastrarLayout($dados);
         }
 
-        echo $this->template->rendenrizar('layouts.html',
-        [
-            'layouts' => (new Layout)->buscarLayout(),
-            'URL_DEV' => URL_DEV
-        ]);
+        echo $this->template->rendenrizar(
+            'layouts.html',
+            [
+                'layouts' => (new Layout)->buscarLayout(),
+                'URL_DEV' => URL_DEV
+            ]
+        );
     }
 
     //Analisar como seria para deletar, pois o layout está vinculado em outras tabelas
     public function deletar($id): void
     {
-        //$id = filter_input(INPUT_POST, FILTER_DEFAULT);
+        //$id = filter_input(INPUT_POST, FILTER_UNSAFE_RAW);
 
         if (!empty($id)) {
             (new Layout)->deletar($id);

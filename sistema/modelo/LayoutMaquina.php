@@ -14,7 +14,7 @@ class LayoutMaquina extends Modelo
     $querys = [];
     //$i= 1;
     foreach ($dados as $chave => $valor) {
-      $query = "INSERT INTO layout_machine (fk_id_layout, fk_id_machine) VALUES ";
+      $query = "INSERT INTO {$this->tabela} (fk_id_layout, fk_id_machine) VALUES ";
       $querys[] = $query .= "($id, $valor)";
       //$i++;
     }
@@ -28,7 +28,7 @@ class LayoutMaquina extends Modelo
 
   public function buscarLayout_Machine(string $layout): array
   {
-    $query = "SELECT m.id_machine, m.model, m.designation FROM layout_machine AS lm JOIN machine AS m ON lm.fk_id_machine = m.id_machine WHERE fk_id_layout = $layout 
+    $query = "SELECT m.id_machine, m.model, m.designation FROM {$this->tabela} AS lm JOIN machine AS m ON lm.fk_id_machine = m.id_machine WHERE fk_id_layout = $layout 
         ORDER BY fk_id_machine ASC";
 
     return $this->conection->select($query);

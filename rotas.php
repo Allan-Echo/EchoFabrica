@@ -1,9 +1,10 @@
 <?php
 
 use Pecee\SimpleRouter\SimpleRouter;
-use sistema\controlador\SiteControlador;
+//use sistema\controlador\SiteControlador;
 use sistema\nucleo\Helpers;
 
+    // Algumas Rotas estão dentro de botões na view
 try {
     // Analisar onde precisar ser get e post
     SimpleRouter::setDefaultNamespace('sistema\Controlador');
@@ -25,7 +26,7 @@ try {
 
     // Rotas para Layouts
     SimpleRouter::group([], function() {
-
+        //Não sei a utilidade dessa rota abaixo
         //SimpleRouter::match(['get', 'post'], BASE_ROUTE . 'layouts/{layout}/producao', 'SiteControlador@producao');
         
         SimpleRouter::match(['get', 'post'], BASE_ROUTE . 'layouts/montar/{id}', 'SiteControlador@montarLayout');

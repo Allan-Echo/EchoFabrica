@@ -6,11 +6,13 @@ use sistema\nucleo\Modelo;
 
 class Producao extends Modelo
 {
-    public function guardarProducao(string $layout, array $dados)
+  protected string $tabela = 'production';
+
+  public function guardarProducao(string $layout, array $dados)
   {
     $data = DATA;
     foreach ($dados as $id_maquina => $operações) {
-      $query = "INSERT INTO production (fk²_id_layout, fk²_id_machine, operations, production_at) VALUES ";
+      $query = "INSERT INTO {$this->tabela} (fk²_id_layout, fk²_id_machine, operations, production_at) VALUES ";
       $querys[] = $query .= "($layout, $id_maquina, $operações, $data)";
     }
 

@@ -18,7 +18,7 @@ class Layout extends Modelo
 
   public function listarLayout(): array
   {
-    $query = "SELECT * FROM layout";
+    $query = "SELECT * FROM {$this->tabela}";
 
     return $this->conection->select($query);
   }
@@ -31,7 +31,7 @@ class Layout extends Modelo
 
   public function filtrarLayout(string $id): array
   {
-    $query = "SELECT * FROM layout WHERE id_layout = $id";
+    $query = "SELECT * FROM {$this->tabela} WHERE id_layout = $id";
 
     return $this->conection->select($query);
   }
@@ -39,7 +39,7 @@ class Layout extends Modelo
   //Analisar como seria para deletar, pois o layout está vinculado em outras tabelas
   public function deletar(string $id): void
   {
-    $query = "DELETE FROM layout WHERE id_layout = $id";
+    $query = "DELETE FROM {$this->tabela} WHERE id_layout = $id";
     $this->conection->delete($query);
   }
 }
