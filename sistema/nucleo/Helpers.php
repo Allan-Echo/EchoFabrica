@@ -17,7 +17,7 @@ class Helpers {
     
     public static function url(?string $url = null): string
     {
-        $servidor = filter_input(INPUT_SERVER,'SERVER_NAME',FILTER_DEFAULT);
+        $servidor = filter_input(INPUT_SERVER,'SERVER_NAME',FILTER_UNSAFE_RAW);
 
         $ambiente = ($servidor == 'localhost' ? URL_DEV : URL_PROD);
 
@@ -26,7 +26,7 @@ class Helpers {
     
     public static function localhost():bool
     {
-        $servidor = filter_input(INPUT_SERVER,'SERVER_NAME',FILTER_DEFAULT);
+        $servidor = filter_input(INPUT_SERVER,'SERVER_NAME',FILTER_UNSAFE_RAW);
 
         if($servidor == 'localhost') {
             return true;
