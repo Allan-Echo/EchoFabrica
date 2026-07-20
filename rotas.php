@@ -1,7 +1,8 @@
 <?php
 
 use Pecee\SimpleRouter\SimpleRouter;
-//use sistema\controlador\SiteControlador;
+use sistema\controlador\MaquinaControlador;
+//use sistema\controlador\SiteControlador;->qual a utilidade?
 use sistema\nucleo\Helpers;
 
     // Algumas Rotas estão dentro de botões na view
@@ -16,6 +17,7 @@ try {
 
     SimpleRouter::group([], function() {
         SimpleRouter::match(['get','post'], BASE_ROUTE. 'produção/{layout}', 'SiteControlador@produção');
+        SimpleRouter::get(BASE_ROUTE.'maquinas','MaquinaControlador@maquinas');
     });
 
     // Rotas para Máquinas

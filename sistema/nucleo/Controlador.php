@@ -3,7 +3,7 @@
 namespace sistema\nucleo;
 use sistema\nucleo\suporte\Template;
 
-class Controlador
+abstract class Controlador
 {
     protected Template $template;
 
