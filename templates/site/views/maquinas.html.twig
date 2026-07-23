@@ -61,146 +61,110 @@
                     </tbody>
                   </table>
                   <!-- Zona de Ações Inferior (UX unificada ao lado de Cadastrar) -->
-                  <div class="d-flex gap-2 mt-3 flex-wrap">
-                    <button type="button" class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#newDenomination">
-                      <i class="bi bi-plus-lg me-1"></i>
-                      Cadastrar Máquina
-                    </button>
-                    <!-- Botão Dinâmico de Detalhes -->
-                    <button type="button" id="btnAcaoDetalhes" class="btn btn-primary btn-sm d-none" data-bs-toggle="modal" data-bs-target="#modalVerDetalhes">
-                      <i class="bi bi-card-text me-1"></i>
-                      Ver Detalhes Selecionados
-                    </button>
-                    <!-- Botão Dinâmico de Exclusão -->
-                    <button type="button" id="btnAcaoExcluir" class="btn btn-danger btn-sm d-none" data-bs-toggle="modal" data-bs-target="#modalConfirmarExclusao">
-                      <i class="bi bi-trash-fill me-1"></i>
-                      Excluir Selecionados
-                    </button>
-                  </div>
+                  <!-- Botão link para Cadastro de Máquina -->
+                    <a href="{{ url('maquinas/cadastro') }}" class="btn btn-info btn-sm text-white"> <i class="bi bi-plus-lg me-1"></i>
+                    Cadastrar Máquina
+                  </a>
+                  <!-- Botão Dinâmico de Detalhes -->
+                  <button type="button" id="btnAcaoDetalhes" class="btn btn-primary btn-sm d-none" data-bs-toggle="modal" data-bs-target="#modalVerDetalhes">
+                    <i class="bi bi-card-text me-1"></i>
+                    Ver Detalhes Selecionados
+                  </button>
+                  <!-- Botão Dinâmico de Exclusão -->
+                  <button type="button" id="btnAcaoExcluir" class="btn btn-danger btn-sm d-none" data-bs-toggle="modal" data-bs-target="#modalConfirmarExclusao">
+                    <i class="bi bi-trash-fill me-1"></i>
+                    Excluir Selecionados
+                  </button>
                 </div>
-                <!-- MODAL: Confirmação de Exclusão -->
-                <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title">
-                          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                          Confirmar Exclusão
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <p>
-                          Você tem certeza que deseja excluir as máquinas selecionadas? Esta ação não poderá ser desfeita.
-                        </p>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                          Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-danger">
-                          Sim, desejo excluir
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-              <!-- MODAL: Detalhes das Máquinas Selecionadas -->
-              <div class="modal fade" id="modalVerDetalhes" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
+              </div>
+              <!-- MODAL: Confirmação de Exclusão -->
+              <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
+                    <div class="modal-header bg-danger text-white">
                       <h5 class="modal-title">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        Detalhes das Máquinas
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Confirmar Exclusão
                       </h5>
                       <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body pb-0">
-                      <!-- O Twig já deixa todos os detalhes renderizados e escondidos aqui dentro -->
-                      <div id="container-detalhes-lote">
-                        {% for maquina in maquinas %}
-                          <div class="detalhe-maquina-item d-none mb-4 pb-3 border-bottom" data-id-maquina="{{ maquina.id_machine }}">
-                            <h5 class="text-primary text-uppercase fw-bold">
-                              {{ maquina.model }}
-                            </h5>
-                            <div class="row mt-2">
-                              <div class="col-6">
-                                <strong>
-                                  Peça por Produção:
-                                </strong>
-                                {{ maquina.piece_operations }}
-                              </div>
-                              <div class="col-6">
-                                <strong>
-                                  Valor de Compra:
-                                </strong>
-                                {{ maquina.purchase_price }}
-                              </div>
-                            </div>
-                            <!-- Adicione aqui quaisquer outros dados que venham na sua variável 'maquina' -->
-                            <div class="row mt-2">
-                              <div class="col-12">
-                                <strong>
-                                  Quantidade de Máquinas na Fábrica:
-                                </strong>
-                                {{ maquina.quantity }}
-                              </div>
-                            </div>
-                          </div>
-                        {% endfor %}
-                      </div>
+                    <div class="modal-body">
+                      <p>
+                        Você tem certeza que deseja excluir as máquinas selecionadas? Esta ação não poderá ser desfeita.
+                      </p>
                     </div>
-                    <div class="modal-footer border-top-0 pt-0">
+                    <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Fechar
+                        Cancelar
+                      </button>
+                      <button type="submit" class="btn btn-danger">
+                        Sim, desejo excluir
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-              <!-- MODAL: Cadastrar Máquina -->
-              <div class="modal fade" id="newDenomination" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="modalLabel">
-                        Novo layout
-                      </h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form method="post">
-                      <div class="modal-body">
-                        <div class="d-inline-flex align-items-start w-100">
-                          <label for="tituloLayout" class="fs-6 form-label col-4 fw-semibold align-self-center">
-                            Nome do
-                            Layout
-                          </label>
-                          <input type="text" class="form-control" id="tituloLayout" name="nome"></div>
-                          <div class="d-inline-flex align-items-start mt-3 w-100">
-                            <label for="descLayout" class="fs-6 form-label col-4 fw-semibold align-self-center">
-                              Descrição
-                            </label>
-                            <textarea class="form-control" id="descLayout" rows="2" name="descricao"></textarea>
+            </form>
+            <!-- MODAL: Detalhes das Máquinas Selecionadas -->
+            <div class="modal fade" id="modalVerDetalhes" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                      <i class="bi bi-info-circle-fill me-2"></i>
+                      Detalhes das Máquinas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body pb-0">
+                    <!-- O Twig já deixa todos os detalhes renderizados e escondidos aqui dentro -->
+                    <div id="container-detalhes-lote">
+                      {% for maquina in maquinas %}
+                        <div class="detalhe-maquina-item d-none mb-4 pb-3 border-bottom" data-id-maquina="{{ maquina.id_machine }}">
+                          <h5 class="text-primary text-uppercase fw-bold">
+                            {{ maquina.model }}
+                          </h5>
+                          <div class="row mt-2">
+                            <div class="col-6">
+                              <strong>
+                                Peça por Produção:
+                              </strong>
+                              {{ maquina.piece_operations }}
+                            </div>
+                            <div class="col-6">
+                              <strong>
+                                Valor de Compra:
+                              </strong>
+                              {{ maquina.purchase_price }}
+                            </div>
+                          </div>
+                          <!-- Adicione aqui quaisquer outros dados que venham na sua variável 'maquina' -->
+                          <div class="row mt-2">
+                            <div class="col-12">
+                              <strong>
+                                Quantidade de Máquinas na Fábrica:
+                              </strong>
+                              {{ maquina.quantity }}
+                            </div>
                           </div>
                         </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Fechar
-                          </button>
-                          <input type="submit" value="Salvar" class="btn btn-primary"></div>
-                        </form>
-                      </div>
+                      {% endfor %}
                     </div>
                   </div>
-                {% endblock %}
+                  <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                      Fechar
+                    </button>
+                  </div>
+                </div>
               </div>
-            </main>
+            </div>
           {% endblock %}
-          {% block script %}
-            <script>
-              {% include 'assets/js/maquinas.js' %}      
-            </script> 
-          {% endblock %}
-          
+        </main>
+      {% endblock %}
+      {% block script %}
+        <script>
+          {% include 'assets/js/maquinas.js' %}                  
+        </script> 
+      {% endblock %}
+      

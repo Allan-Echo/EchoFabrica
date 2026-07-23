@@ -64,6 +64,7 @@ class SiteControlador extends Controlador
         if (!empty($dados)) {
 
             (new Maquina)->cadastrarMaquina($dados);
+            
             // Para validações posteriormente
             // foreach ($dados as $key => $value) 
             //{
