@@ -58,29 +58,6 @@ class SiteControlador extends Controlador
     //     ]);
     // }
 
-    public function cadastroMaq(): void
-    {
-        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
-        if (!empty($dados)) {
-
-            (new Maquina)->cadastrarMaquina($dados);
-            
-            // Para validações posteriormente
-            // foreach ($dados as $key => $value) 
-            //{
-            //     if ($value == null) 
-            //     {
-            //         if ($key != 'operacoes' && $key != 'valor') {
-            //             die('Campos Obrigatórios em branco');
-            //         } else {die ('enviado com sucesso');}
-            //     } 
-            // }
-        }
-        echo $this->template->rendenrizar(
-            'cadastromaquina.html',
-            []
-        );
-    }
 
     public function montarLayout($id): void
     {

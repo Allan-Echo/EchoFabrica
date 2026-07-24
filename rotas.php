@@ -1,7 +1,7 @@
 <?php
 
 use Pecee\SimpleRouter\SimpleRouter;
-use sistema\controlador\MaquinaControlador;
+//use sistema\controlador\MaquinaControlador;
 //use sistema\controlador\SiteControlador;->qual a utilidade?
 use sistema\nucleo\Helpers;
 
@@ -23,7 +23,7 @@ try {
     // Rotas para Máquinas
     SimpleRouter::group([], function () {
 
-        SimpleRouter::match(['get', 'post'], BASE_ROUTE . 'maquinas/cadastro', 'SiteControlador@cadastroMaq');
+        SimpleRouter::match(['get', 'post'], BASE_ROUTE . 'maquinas/cadastro', 'MaquinaControlador@cadastroMaq');
     });
 
     // Rotas para Layouts

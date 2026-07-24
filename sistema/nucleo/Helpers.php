@@ -1,7 +1,7 @@
 <?php
 
 namespace sistema\nucleo;
-use Exception;
+//use Exception;
 
 class Helpers {
     
