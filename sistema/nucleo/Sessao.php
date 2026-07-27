@@ -40,4 +40,22 @@ class Sessao
         session_destroy();
         return $this;
     }
+
+    //Toda vez que alguém tentar ler uma propriedade neste objeto que NÃO EXISTE, não dê erro! Em vez disso, chame a função __get, me dê o nome do que tentaram ler e deixa que eu busco no lugar certo." No nosso caso, o "lugar certo" é a superglobal $_SESSION.
+    public function __get($chave)
+    {
+        if(!empty($_SESSION[$chave])) {
+            return $_SESSION[$chave];
+        }
+    }
+
+    public function flash(): ?Mensagem
+    {
+        if($this->checar('flash')){
+            $flash = $this->flash;
+            $this->limpar('flash');
+            return $flash;
+        }
+            return null;    
+    }
 }

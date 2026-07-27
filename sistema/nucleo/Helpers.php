@@ -33,4 +33,13 @@ class Helpers {
         }
         return false;
     }
+
+    public static function flash(): ?string
+    {
+        $sessão = new Sessao;
+        if($flash = $sessão->flash()) {
+            echo $flash;
+        }
+        return null;
+    }
 }

@@ -32,6 +32,11 @@ class Template
                 new \Twig\TwigFunction('url', function (?string $url = null) {
                     return Helpers::url($url);
                 })
+            ),
+             $this->twig->addFunction(
+                new \Twig\TwigFunction('flash', function () {
+                    return Helpers::flash();
+                })
             )
         );
     }
