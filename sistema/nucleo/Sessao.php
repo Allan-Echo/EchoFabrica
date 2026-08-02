@@ -49,6 +49,7 @@ class Sessao
         }
     }
 
+    // Ele vai verificar se existe um Objeto armazenado na sessão com a chave 'flash'(que é armazenado pelo método flash da classe Mensagem, depois de instaciado e parametrizado pelo controlador). Se existir um objeto dentro com a chave 'flash', ele clona Objeto da classe Mensagem, salva em uma variável chamada flash e depois "apaga" da esse objeto da sessão e quando o helpers chamar essa função, ele vai devolver o 'clone' do Objeto da classe Mensagem, da forma como foi parametrizado pelo controlador. Se não tiver nenhum Objeto armazenado na sessão com a chave 'flash', ele retorna null.
     public function flash(): ?Mensagem
     {
         if($this->checar('flash')){
