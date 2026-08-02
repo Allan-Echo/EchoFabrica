@@ -2,13 +2,13 @@
 
 namespace sistema\controlador;
 
-use sistema\modelo\Maquina;
 use sistema\modelo\Layout;
 use sistema\modelo\LayoutMaquina;
+use sistema\modelo\Maquina;
 use sistema\modelo\Producao;
 use sistema\nucleo\Helpers;
 
-class SiteControlador extends AdminControlador
+class SiteControlador extends LoginControlador
 {
     public function erro404(): void
     {
