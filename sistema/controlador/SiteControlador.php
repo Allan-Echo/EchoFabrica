@@ -6,16 +6,10 @@ use sistema\modelo\Maquina;
 use sistema\modelo\Layout;
 use sistema\modelo\LayoutMaquina;
 use sistema\modelo\Producao;
-use sistema\nucleo\Controlador;
 use sistema\nucleo\Helpers;
 
-class SiteControlador extends Controlador
+class SiteControlador extends AdminControlador
 {
-    public function __construct()
-    {
-        parent::__construct('templates/site/views');
-    }
-
     public function erro404(): void
     {
         echo $this->template->rendenrizar('404.html', []);

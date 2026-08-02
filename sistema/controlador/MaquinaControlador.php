@@ -26,7 +26,7 @@ class MaquinaControlador extends SiteControlador
 
          // Valida cada campo recebido, exceto o campo 'valor'
          foreach ($dados as $key => $value) {
-            if ($key != 'valor') {
+            if ($key === 'valor') {
                continue;
             }
             if (trim((string) $value) === '') {
