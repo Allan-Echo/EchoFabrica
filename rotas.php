@@ -15,6 +15,7 @@ try {
     SimpleRouter::get(BASE_ROUTE . 'post/{dado}', 'SiteControlador@post');
     SimpleRouter::get(BASE_ROUTE . 'dashboard/{layout}', 'SiteControlador@dashboard');
 
+    //Rota pra login
     SimpleRouter::match(['get','post'], BASE_ROUTE.'login', 'LoginControlador@login');
 
     SimpleRouter::group([], function() {
