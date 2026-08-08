@@ -42,7 +42,7 @@ class Sessao
     }
 
     //Toda vez que alguém tentar ler uma propriedade neste objeto que NÃO EXISTE, não dê erro! Em vez disso, chame a função __get, me dê o nome do que tentaram ler e deixa que eu busco no lugar certo." No nosso caso, o "lugar certo" é a superglobal $_SESSION.
-    public function __get(mixed $chave)
+    public function __get(string $chave)
     {
         if(!empty($_SESSION[$chave])) {
             return $_SESSION[$chave];

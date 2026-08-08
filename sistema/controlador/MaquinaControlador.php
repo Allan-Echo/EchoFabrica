@@ -5,7 +5,7 @@ namespace sistema\controlador;
 use sistema\modelo\Maquina;
 use sistema\nucleo\Helpers;
 
-class MaquinaControlador extends SiteControlador
+class MaquinaControlador extends AdminControlador
 {
    public function maquinas(): void
    {

@@ -8,7 +8,7 @@ use sistema\modelo\Maquina;
 use sistema\modelo\Producao;
 use sistema\nucleo\Helpers;
 
-class SiteControlador extends LoginControlador
+class SiteControlador extends AdminControlador
 {
     public function erro404(): void
     {
