@@ -27,7 +27,7 @@ class AdminControlador extends Controlador
         }
     }
 
-    private final function acessoNegado(): void
+    private function acessoNegado(): void
     {
         $sessao = new Sessao();
         $sessao->limpar('usuarioId');

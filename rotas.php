@@ -18,6 +18,9 @@ try {
     //Rota pra login
     SimpleRouter::match(['get','post'], BASE_ROUTE.'login', 'LoginControlador@login');
 
+    // Rota/Método para logout
+    SimpleRouter::get(BASE_ROUTE.'logout', 'DashboardControlador@logout');
+
     SimpleRouter::group([], function() {
         SimpleRouter::match(['get','post'], BASE_ROUTE. 'produção/{layout}', 'SiteControlador@produção');
         SimpleRouter::get(BASE_ROUTE.'maquinas','MaquinaControlador@maquinas');

@@ -13,7 +13,7 @@ class UsuarioControlador extends Controlador
         return parent::__construct('templates/site/views');
     }
 
-    public static function usuario() {
+    public static function usuario(): ?object {
         $sessao = new Sessao();
         if(!$sessao->checar('usuarioId')) {
             return null;
