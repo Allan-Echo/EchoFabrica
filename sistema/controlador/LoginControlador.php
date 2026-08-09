@@ -29,7 +29,7 @@ class LoginControlador extends Controlador
             if ($this->checarDados($dados)) {
                 $usuario = (new UsuarioModelo())->login($dados, 3);
                 if ($usuario) {
-                    Helpers::redirecionar('login');
+                    Helpers::redirecionar('maquinas');
                     exit;
                 }
 

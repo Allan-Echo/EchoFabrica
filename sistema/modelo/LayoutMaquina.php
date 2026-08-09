@@ -6,7 +6,7 @@ use sistema\nucleo\Modelo;
 
 class LayoutMaquina extends Modelo
 {
-    protected $tabela = "layout_machine";
+    protected $tabela = 'layout_machine';
     
     public function montarLayout(string $id, array $dados)
   {
