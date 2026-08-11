@@ -6,6 +6,10 @@ use sistema\nucleo\Modelo;
 
 class Maquina extends Modelo
 {
+  public function __construct()
+  {
+    parent::__construct('machine');
+  }
 
   public function buscarMaq(): array
   {

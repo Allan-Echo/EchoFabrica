@@ -9,9 +9,11 @@ class MaquinaControlador extends AdminControlador
 {
    public function maquinas(): void
    {
+      $maquina = new Maquina();   
+
       echo $this->template->rendenrizar(
          'maquinas.html.twig',
-         ['maquinas' => (new Maquina)->buscarMaq()]
+         ['maquinas' => $maquina->buscar()->ordenar('model ASC')->resultado()]
       );
    }
 

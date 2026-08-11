@@ -6,7 +6,10 @@ use sistema\nucleo\Modelo;
 
 class Layout extends Modelo
 {
-  protected string $tabela = 'layout';
+  public function __construct()
+  {
+    parent::__construct('layout');
+  }
 
   public function cadastrarLayout(array $dados): void
   {

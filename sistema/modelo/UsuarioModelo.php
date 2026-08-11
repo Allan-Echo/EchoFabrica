@@ -7,7 +7,10 @@ use sistema\nucleo\Sessao;
 
 class UsuarioModelo extends Modelo
 {
-    protected string $tabela = 'users';
+    public function __construct() {
+        parent::__construct('users');
+    }
+
     public function buscarPorEmail(string $email): ?Array
     {
         $query = "SELECT * FROM " . $this->tabela . " WHERE email = :email LIMIT 1";

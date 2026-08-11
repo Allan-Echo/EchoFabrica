@@ -7,6 +7,10 @@ use sistema\nucleo\Modelo;
 class LayoutMaquina extends Modelo
 {
     protected $tabela = 'layout_machine';
+
+    public function __construct() {
+      parent::__construct('layout_machine');
+    }
     
     public function montarLayout(string $id, array $dados)
   {

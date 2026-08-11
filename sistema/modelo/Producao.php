@@ -6,7 +6,9 @@ use sistema\nucleo\Modelo;
 
 class Producao extends Modelo
 {
-  protected string $tabela = 'production';
+  public function __construct() {
+    parent::__construct('production');
+  }
 
   public function guardarProducao(string $layout, array $dados)
   {
