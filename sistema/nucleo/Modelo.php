@@ -62,7 +62,7 @@ abstract class Modelo
             $query .= " LIMIT {$this->limite} OFFSET {$this->offset}";
         }
 
-        return $this->conection->select($query, $this->parametros ?? null);
+        return $this->conection->select($query, $this->parametros ?? null, static::class);
     }
 
     protected function cadastrar(array $dados): void {
@@ -113,10 +113,50 @@ abstract class Modelo
         $this->conection->update($query, array_merge($dados, $parametros));
     }
 
+    public function erro(): mixed
+    {
+        return $this->erro;
+    }
+
+    public function mensagem(): Mensagem
+    {
+        return $this->mensagem;
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        if(empty($this->dados)) {
+            $this->dados = new \stdClass();
+        }
+        $this->dados->$name = $value;
+    }
+
+    protected function armazenar(): array
+    {
+        $dados = (array) $this->dados;
+        return $this->filtro($dados);
+    }
+
+    public function salvar():bool
+    {
+        if(empty($this->id)) {
+            $this->cadastrar($this->armazenar());
+            if ($this->erro) {
+                $this->mensagem->erro('Erro ao cadastrar registro: ' . $this->erro)->flash();
+                return false;
+            }
+        } else {
+            $this->atualizar($this->armazenar(), 'id = :id', ['id' => $this->id]);
+        }
+        return true;
+    }
+
     public function buscarPorId(int $id): ?object
     {
         $query = "SELECT * FROM " . $this->tabela . " WHERE id = :id LIMIT 1";
-        $resultado = $this->conection->select($query, ['id' => $id]) ?? null;
-        return $resultado ? (object) $resultado[0] : null;
+        
+        $resultado = $this->conection->select($query, ['id' => $id], static::class);
+        
+        return $resultado[0] ?? null;
     }
 }
