@@ -444,4 +444,18 @@ class EasyPDO
       $this->connection = null;
       
     }
+    // ========================================================================
+    // Extra Methods PDO
+    // ========================================================================
+
+    /**
+     * Retorna o último ID inserido na conexão ativa.
+     *
+     * @param string|null $name Nome da sequência (útil para bancos como PostgreSQL)
+     * @return string|false
+     */
+    public function lastInsertId(?string $name = null): string|false
+    {
+        return $this->connection->lastInsertId($name);
+    }
 }    
