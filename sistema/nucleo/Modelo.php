@@ -138,7 +138,7 @@ abstract class Modelo
      * @see filtro() Sanitiza os dados antes da inserção
      * @see salvar() Método público que chama este
      */
-    protected function cadastrar(array $dados): int|string|null {
+    protected function cadastrar(array $dados): bool|string|null {
         $dados = $this->filtro($dados);
 
         $colunas = implode(', ', array_keys($dados));
@@ -147,7 +147,7 @@ abstract class Modelo
         
         $this->conection->insert($query, $dados);
 
-        return $this->conection->lastInsertId();
+        return true;
     }
 
     /**
@@ -201,7 +201,7 @@ abstract class Modelo
      *
      * @see filtro() Sanitiza os dados antes da atualização
      */
-    protected function atualizar(array $dados, string $where, array $parametros): void 
+    protected function atualizar(array $dados, string $where, array $parametros): bool 
     {
         $dados = $this->filtro($dados);
 
@@ -213,6 +213,8 @@ abstract class Modelo
         $query = "UPDATE {$this->tabela} SET {$setString} WHERE {$where}";
 
         $this->conection->update($query, array_merge($dados, $parametros));
+
+        return true;
     }
 
     /**
@@ -246,6 +248,11 @@ abstract class Modelo
         return $this->mensagem;
     }
 
+    public function dados(): mixed
+    {
+        return $this->dados;
+    }
+
     /**
      * Magic method que captura atribuições de propriedades dinâmicas.
      *
@@ -268,6 +275,16 @@ abstract class Modelo
             $this->dados = new \stdClass();
         }
         $this->dados->$name = $value;
+    }
+
+    public function __isset(string $campo)
+    {
+        return isset($this->dados->$campo);
+    }
+
+    public function __get(string $campo)
+    {
+        return $this->dados->$campo ?? null;
     }
 
     /**
@@ -305,21 +322,30 @@ abstract class Modelo
      * @see erro() Obtém mensagem de erro
      */
     public function salvar(): bool
+{
+    return empty($this->id) ? $this->executarCadastro() : $this->executarAtualizacao();
+}
+
+    private function executarCadastro(): bool
     {
-        if (empty($this->id)) {
-            $this->cadastrar($this->armazenar());
-            if ($this->erro) {
-                $this->mensagem->erro('Erro ao cadastrar registro: ' . $this->erro)->flash();
-                return false;
-            }
-            
-        } elseif (!empty($this->id)) {
-            $this->atualizar($this->armazenar(), 'id = :id', ['id' => $this->id]);
-            if ($this->erro) {
-                $this->mensagem->erro('Erro ao atualizar registro: ' . $this->erro)->flash();
-                return false;
-            }
+        if (!$this->cadastrar($this->armazenar())) {
+            $this->mensagem->erro('Erro de sistema ao tentar cadastrar os dados.')->flash();
+            return false;
         }
+
+        $this->id = $this->conection->lastInsertId();
+        
+        return true;
+    }
+
+    private function executarAtualizacao(): bool
+    {
+        if (!$this->atualizar($this->armazenar(), "id = :id", ['id' => $this->id])) {
+            $this->mensagem->erro('Erro de sistema ao tentar atualizar os dados.')->flash();
+            return false;
+        }
+        
+        $this->dados->buscarPorId($this->id)->dados;
         return true;
     }
 
