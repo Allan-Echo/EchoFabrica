@@ -225,7 +225,7 @@ abstract class Modelo
 
         return true;
     }
-
+    
     /**
      * Retorna a mensagem de erro da última operação.
      *
