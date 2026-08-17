@@ -10,13 +10,12 @@ abstract class Modelo
      * @var EasyPDO
      */
     protected EasyPDO $conection;
-    
     protected Mensagem $mensagem;
+    protected Erro $erro;
     
     protected string $tabela;
     protected mixed $dados;
     protected mixed $query = null;
-    protected mixed $erro;
     protected mixed $parametros = null; 
     protected mixed $ordem = null;
     protected mixed $limite = null;
@@ -34,6 +33,7 @@ abstract class Modelo
     {
         $this->conection = new EasyPDO();
         $this->mensagem = new Mensagem();
+        $this->erro = new Erro;
         $this->tabela = $tabela;
     }
 
@@ -139,6 +139,10 @@ abstract class Modelo
      * @see salvar() Método público que chama este
      */
     protected function cadastrar(array $dados): bool|string|null {
+        
+    try {
+       $this->erro->limparErro();
+
         $dados = $this->filtro($dados);
 
         $colunas = implode(', ', array_keys($dados));
@@ -148,6 +152,11 @@ abstract class Modelo
         $this->conection->insert($query, $dados);
 
         return true;
+    } catch (\Throwable $e) {
+        $this->erro->definir('Falha ao inserir no banco' . $e->getMessage());
+        return false;
+    }
+        
     }
 
     /**
@@ -176,7 +185,7 @@ abstract class Modelo
             } elseif (is_int($value)) {
                 $dadosFiltrados[$key] = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
             } elseif (is_float($value)) {
-                $dadosFiltrados[$key] = filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+                $dadosFiltrados[$key] = filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, [FILTER_FLAG_ALLOW_FRACTION|FILTER_FLAG_ALLOW_THOUSAND]);
             } else {
                 $dadosFiltrados[$key] = $value;
             }
@@ -228,7 +237,7 @@ abstract class Modelo
      *
      * @see mensagem() Retorna objeto Mensagem para mais controle
      */
-    public function erro(): mixed
+    public function erro(): Erro
     {
         return $this->erro;
     }
@@ -277,12 +286,12 @@ abstract class Modelo
         $this->dados->$name = $value;
     }
 
-    public function __isset(string $campo)
+    public function __isset(string $campo):bool
     {
         return isset($this->dados->$campo);
     }
 
-    public function __get(string $campo)
+    public function __get(string $campo): mixed
     {
         return $this->dados->$campo ?? null;
     }
@@ -345,7 +354,7 @@ abstract class Modelo
             return false;
         }
         
-        $this->dados->buscarPorId($this->id)->dados;
+        $this->dados->buscarPorId($this->id);
         return true;
     }
 
