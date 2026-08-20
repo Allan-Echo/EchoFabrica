@@ -35,8 +35,9 @@ class Maquina extends Modelo
         continue;
       
         $colunas[$i] = $dados[$value];
+        $i++;
       }
-      return $colunas;
+      return die(print_r($colunas));
     }
 
     
