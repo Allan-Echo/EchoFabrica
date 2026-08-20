@@ -18,10 +18,32 @@ class Maquina extends Modelo
     return $this->conection->select($query);
   }
 
-  public function cadastrarMaquina(array $dados): void
+  public function cadastrarMaquina(array $dados): ?array
   {
-    $query = "INSERT INTO machine (model, brand, designation, piece_operations, purchase_price, quantity) VALUES (:modelo, :marca, :funcao, :operacoes, :valor, :qtd)"; // testar se funciona sem as aspas em values
+    $colunas = $this->buscarColunas();
+    if (!$colunas) {
+      $mensagem = $this->erro->obter();
+      $this->mensagem->erro($mensagem)->flash();
+    }
 
-    $this->conection->insert($query, $dados);
+    // for ($i=0; $i < count($colunas) ; $i++) {
+    //   if ($colunas[$i] == 'id_machine')
+    //   continue; 
+      foreach ($dados as $value) {
+        $i = 0;  
+        if ($colunas[$i] == 'id_machine')
+        continue;
+      
+        $colunas[$i] = $dados[$value];
+      }
+      return $colunas;
+    }
+
+    
+    
+
   }
-}
+  //   $query = "INSERT INTO machine (model, brand, designation, piece_operations, purchase_price, quantity) VALUES (:modelo, :marca, :funcao, :operacoes, :valor, :qtd)"; // testar se funciona sem as aspas em values
+
+  //   $this->conection->insert($query, $dados);
+  //

@@ -42,10 +42,10 @@ class MaquinaControlador extends AdminControlador
             $this->mensagem->erro('Campos obrigatórios em branco')->flash();
          } else {
             // Se não houver erro, cadastra a máquina e exibe mensagem de sucesso
-            (new Maquina)->cadastrarMaquina($dados);
-            $this->mensagem->sucesso('Máquina cadastrada com sucesso')->flash();
-            Helpers::redirecionar('maquinas');
-            exit();
+            print_r((new Maquina)->cadastrarMaquina($dados));
+            // $this->mensagem->sucesso('Máquina cadastrada com sucesso')->flash();
+            // Helpers::redirecionar('maquinas');
+            // exit();
          }
       }
 
