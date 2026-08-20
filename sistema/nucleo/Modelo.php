@@ -6,20 +6,56 @@ use sistema\nucleo\suporte\EasyPDO;
 
 abstract class Modelo
 {   
-    /**
-     * @var EasyPDO
+        /**
+     * @var EasyPDO Instância da conexão com o banco de dados via PDO.
      */
     protected EasyPDO $conection;
+
+    /**
+     * @var Mensagem Instância para gerenciamento de mensagens de feedback/flash.
+     */
     protected Mensagem $mensagem;
+
+    /**
+     * @var Erro Instância para gerenciamento e captura de erros de banco/sistema.
+     */
     protected Erro $erro;
     
+    /**
+     * @var string Nome da tabela associada ao modelo no banco de dados.
+     */
     protected string $tabela;
+
+    /**
+     * @var mixed Armazena os dados do registro (geralmente um stdClass).
+     */
     protected mixed $dados;
+
+    /**
+     * @var string|null Armazena a query SQL que está sendo construída.
+     */
     protected mixed $query = null;
+
+    /**
+     * @var array|null Parâmetros para substituição no Prepared Statement.
+     */
     protected mixed $parametros = null; 
+
+    /**
+     * @var string|null Cláusula de ordenação (ORDER BY).
+     */
     protected mixed $ordem = null;
+
+    /**
+     * @var int|null Limite de registros a serem retornados (LIMIT).
+     */
     protected mixed $limite = null;
-    protected mixed $offset = 0;
+
+    /**
+     * @var int Deslocamento inicial para a consulta (OFFSET).
+     */
+    protected int $offset = 0;
+
     
     /**
      * Construtor da classe Modelo.
@@ -37,22 +73,32 @@ abstract class Modelo
         $this->tabela = $tabela;
     }
 
-    /**
-     * Monta a base de uma consulta SELECT com filtros opcionais.
+            /**
+     * Monta a estrutura base de uma consulta SELECT.
      *
-     * Constrói a cláusula SELECT básica e WHERE (se fornecida).
-     * Utiliza prepared statements para segurança contra SQL injection.
-     * Retorna $this para permitir encadeamento de métodos (Fluent Interface).
+     * Este método utiliza uma interface fluida, permitindo o encadeamento de 
+     * métodos como ordenar() e limitar() antes de chamar resultado().
      *
-     * @param string|null $where Cláusula WHERE, ex: "status = :status AND ativo = :ativo"
-     * @param string|null $parametros String de parâmetros, ex: "status=1&ativo=true"
-     * @param string $coluna Colunas a selecionar. Padrão: '*' (todas)
+     * Exemplo:
+     * ```php
+     * $usuarios = $modelo->buscar("status = :s", "s=ativo", "nome, email")
+     *                    ->ordenar("nome ASC")
+     *                    ->resultado();
+     * ```
      *
-     * @return self Retorna a instância para encadeamento
+     * @param string|null $where Cláusula WHERE (ex: "id = :id").
+     * @param string|null $parametros Query string de parâmetros (ex: "id=1&status=ativo").
+     * @param string $coluna Colunas a selecionar (padrão: "*").
+     * @return static Retorna a própria instância para encadeamento.
+     * @see ordenar() Para definir a ordem dos resultados.
+     * @see limitar() Para definir paginação.
+     * @see resultado() Para executar a query e obter os dados.
      */
-    public function buscar(?string $where = null, ?string $parametros = null, string $coluna = '*'): self
+    public function buscar(?string $where = null, ?string $parametros = null, string $coluna = '*'): static
     {
        $this->query = "SELECT {$coluna} FROM " . $this->tabela;
+
+
 
         if (!empty($where)) {
             $this->query .= " WHERE {$where}";
@@ -62,56 +108,51 @@ abstract class Modelo
         return $this;
     }
 
-    /**
-     * Define a ordenação da consulta SELECT.
+            /**
+     * Define a cláusula de ordenação da consulta.
      *
-     * Armazena a cláusula ORDER BY que será aplicada no resultado final.
-     * Chamado após buscar() e antes de resultado().
-     *
-     * @param string $ordem Cláusula ORDER BY, ex: "nome ASC" ou "id DESC, data ASC"
-     *
-     * @return self Retorna a instância para encadeamento
+     * @param string $ordem Cláusula ORDER BY (ex: "id DESC" ou "nome ASC, data DESC").
+     * @return static Retorna a própria instância para encadeamento.
+     * @see buscar() Deve ser chamado após o buscar().
      */
-    public function ordenar(string $ordem): self
+    public function ordenar(string $ordem): static
     {
         $this->ordem = $ordem;
+
+
         return $this;
     }
 
-    /**
-     * Define a paginação da consulta (LIMIT e OFFSET).
+            /**
+     * Define limites de paginação para a consulta.
      *
-     * Armazena o número máximo de registros a retornar e a posição inicial.
-     * Útil para implementar paginação em listas de dados.
-     *
-     * @param int $limite Quantidade máxima de registros
-     * @param int $offset Posição inicial (quantos pular). Padrão: 0
-     *
-     * @return self Retorna a instância para encadeamento
+     * @param int $limite Quantidade máxima de registros.
+     * @param int $offset Quantidade de registros a pular (padrão: 0).
+     * @return static Retorna a própria instância para encadeamento.
+     * @see buscar() Utilizado em conjunto com buscar() para listar dados.
      */
-    public function limitar(int $limite, int $offset = 0): self
+    public function limitar(int $limite, int $offset = 0): static
     {
         $this->limite = $limite;
+
+
         $this->offset = $offset;
         return $this;
     }
 
-    /**
-     * Executa a consulta SELECT montada pelos métodos anteriores.
+        /**
+     * Finaliza e executa a consulta SELECT montada.
      *
-     * Completa a query com ORDER BY e LIMIT/OFFSET (se definidos),
-     * executa contra o banco e retorna array de objetos.
-     * Sempre chamado por último na cadeia de métodos.
+     * Este método compila todas as partes da query (WHERE, ORDER BY, LIMIT)
+     * e utiliza o EasyPDO para retornar uma coleção de objetos.
      *
-     * @return array Array de objetos do tipo da classe filha
-     *
-     * @see buscar() Monta a base da consulta
-     * @see ordenar() Define ORDER BY
-     * @see limitar() Define LIMIT e OFFSET
+     * @return array Array de objetos da classe que estende este Modelo.
+     * @see buscar() Inicia a montagem da query.
      */
     public function resultado(): array
     {
         $query = $this->query;
+
 
         if (!empty($this->ordem)) {
             $query .= " ORDER BY {$this->ordem}";
@@ -193,37 +234,37 @@ abstract class Modelo
 
         return $dadosFiltrados;
     }
-    /**
-     * Atualiza registros existentes na tabela.
+        /**
+     * Atualiza registros na tabela do banco de dados.
      *
-     * Método protegido com cláusula WHERE obrigatória.
-     * Sanitiza dados via filtro() antes do UPDATE.
-     * Suporta atualizar múltiplos registros conforme a condição WHERE.
-     *
-     * @param array $dados Array com colunas e novos valores
-     * @param string $where Cláusula WHERE para identificar registros, ex: "id = :id"
-     * @param array $parametros Array com valores para a cláusula WHERE
-     *
-     * @return void
-     *
-     * @throws \PDOException Se erro na execução da query SQL
-     *
-     * @see filtro() Sanitiza os dados antes da atualização
+     * @param array $dados Dados associativos para atualização (coluna => valor).
+     * @param string $where Condição para atualização (ex: "id = :id").
+     * @param array $parametros Valores dos parâmetros da condição WHERE.
+     * @return bool True em caso de sucesso, false em caso de falha.
+     * @see filtro() Os dados são automaticamente sanitizados antes do UPDATE.
      */
-    protected function atualizar(array $dados, string $where, array $parametros): bool 
+    protected function atualizar(array $dados, string $where, array $parametros): bool
     {
-        $dados = $this->filtro($dados);
+        try {
 
-        $set = [];
-        foreach ($dados as $key => $value) {
-            $set[] = "{$key} = :{$key}";
+            $this->erro->limparErro();
+
+            $dados = $this->filtro($dados);
+
+            $set = [];
+            foreach ($dados as $key => $value) {
+                $set[] = "{$key} = :{$key}";
+            }
+            $setString = implode(', ', $set);
+            $query = "UPDATE {$this->tabela} SET {$setString} WHERE {$where}";
+
+            $this->conection->update($query, array_merge($dados, $parametros));
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->erro->definir('Erro de sistema ao atualizar dados'.$e->getMessage());
+            return false;
         }
-        $setString = implode(', ', $set);
-        $query = "UPDATE {$this->tabela} SET {$setString} WHERE {$where}";
-
-        $this->conection->update($query, array_merge($dados, $parametros));
-
-        return true;
     }
     
     /**
@@ -257,6 +298,11 @@ abstract class Modelo
         return $this->mensagem;
     }
 
+        /**
+     * Retorna os dados do objeto.
+     *
+     * @return mixed Os dados armazenados no objeto, geralmente um stdClass ou array de resultados.
+     */
     public function dados(): mixed
     {
         return $this->dados;
@@ -265,10 +311,14 @@ abstract class Modelo
     /**
      * Magic method que captura atribuições de propriedades dinâmicas.
      *
-     * Quando você atribui valor a propriedade não declarada explicitamente,
-     * este método é chamado automaticamente.
-     * Armazena o atributo em um stdObject dentro de $this->dados.
-     * Depois, armazenar() converte em array para persistência.
+     * Quando você atribui valor a uma propriedade não declarada explicitamente,
+     * este método é chamado automaticamente. Armazena o atributo em um stdClass 
+     * dentro de $this->dados para posterior persistência.
+     * 
+     * Exemplo:
+     * ```php
+     * $usuario->nome = 'Marcos';
+     * ```
      *
      * @param string $name Nome da propriedade
      * @param mixed $value Valor a atribuir
@@ -286,15 +336,28 @@ abstract class Modelo
         $this->dados->$name = $value;
     }
 
+    /**
+     * Verifica se uma propriedade dinâmica existe no objeto de dados.
+     *
+     * @param string $campo Nome da propriedade
+     * @return bool
+     */
     public function __isset(string $campo):bool
     {
         return isset($this->dados->$campo);
     }
 
+    /**
+     * Recupera uma propriedade dinâmica do objeto de dados.
+     *
+     * @param string $campo Nome da propriedade
+     * @return mixed O valor da propriedade ou null se não encontrada
+     */
     public function __get(string $campo): mixed
     {
         return $this->dados->$campo ?? null;
     }
+
 
     /**
      * Converte dados dinâmicos em array associativo e sanitizado.
@@ -315,26 +378,34 @@ abstract class Modelo
         return $this->filtro($dados);
     }
 
-    /**
-     * Persiste os dados do modelo no banco de dados.
+        /**
+     * Orquestra a persistência dos dados no banco de dados.
      *
-     * Método orquestrador que decide entre INSERT (novo) ou UPDATE (existente).
-     * Se id está vazio, é novo registro; caso contrário, já existe.
-     * Chama armazenar() para preparar, depois cadastrar() para inserir.
-     * Se erro, cria mensagem flash e retorna false.
+     * Decide automaticamente entre uma operação de INSERT (novo registro)
+     * ou UPDATE (registro existente) com base na existência da propriedade 'id'.
      *
-     * @return bool true se salvou com sucesso, false se erro
-     *
-     * @see __set() Atribui dados via propriedades dinâmicas
-     * @see armazenar() Converte dados em array
-     * @see cadastrar() Executa INSERT
-     * @see erro() Obtém mensagem de erro
+     * @return bool True se a operação foi bem-sucedida, false caso contrário.
+     * @see __set() Cria os dados dinâmicos
+     * @see executarCadastro() Chamado se não houver ID.
+     * @see executarAtualizacao() Chamado se houver ID.
+     * @see erro() Caso retorne false, verifique o erro aqui.
      */
     public function salvar(): bool
-{
-    return empty($this->id) ? $this->executarCadastro() : $this->executarAtualizacao();
-}
+    {
+        return empty($this->id) ? $this->executarCadastro() : $this->executarAtualizacao();
+    }
 
+
+        /**
+     * Orquestra a persistência de um novo registro no banco de dados.
+     * 
+     * Chamado internamente pelo método salvar(). Além de cadastrar, 
+     * recupera o último ID inserido e o atribui ao objeto.
+     *
+     * @return bool True em caso de sucesso, false se houver falha (com mensagem flash).
+     * @see salvar()
+     * @see cadastrar()
+     */
     private function executarCadastro(): bool
     {
         if (!$this->cadastrar($this->armazenar())) {
@@ -351,16 +422,34 @@ abstract class Modelo
         return true;
     }
 
+        /**
+     * Orquestra a atualização de um registro existente no banco de dados.
+     * 
+     * Chamado internamente pelo método salvar(). Após a atualização,
+     * sincroniza o objeto atual com os dados recém-salvos no banco de dados.
+     *
+     * @return bool True em caso de sucesso, false se houver falha (com mensagem flash).
+     * @see salvar()
+     * @see atualizar()
+     * @see buscarPorId()
+     */
     private function executarAtualizacao(): bool
     {
         if (!$this->atualizar($this->armazenar(), "id = :id", ['id' => $this->id])) {
-            $this->mensagem->erro('Erro de sistema ao tentar atualizar os dados.')->flash();
+            $mensagem = $this->erro->obter();
+            $this->mensagem->erro($mensagem)->flash();
             return false;
         }
         
-        $this->dados->buscarPorId($this->id);
+        $atualizado = $this->buscarPorId($this->id);
+        if ($atualizado) {
+            $this->dados = $atualizado->dados();
+        }
+
         return true;
     }
+
+
 
     /**
      * Busca um registro específico pela chave primária.
