@@ -125,20 +125,20 @@ abstract class Modelo
     }
 
     /**
-     * Insere um novo registro na tabela.
+     * Insere um novo registro na tabela do banco de dados.
      *
-     * Método protegido chamado internamente por salvar().
-     * Sanitiza dados via filtro() antes de inserir.
-     * Usa prepared statements com parâmetros nomeados.
+     * Método protegido que prepara e executa a inserção. Realiza a limpeza de erros prévios,
+     * sanitiza os dados através do método filtro() e trata exceções capturadas
+     * durante a execução da query INSERT.
      *
-     * @param array $dados Array associativo onde chaves são nomes de colunas
+     * @param array $dados Dados associativos (coluna => valor) para inserção.
      *
-     * @return void
+     * @return bool Retorna true em caso de sucesso ou false em caso de falha.
      *
-     * @see filtro() Sanitiza os dados antes da inserção
-     * @see salvar() Método público que chama este
+     * @see filtro() Sanitiza os dados antes da persistência.
+     * @see Erro::limparErro() Reseta o estado de erro antes da operação.
      */
-    protected function cadastrar(array $dados): bool|string|null {
+    protected function cadastrar(array $dados): bool {
         
     try {
        $this->erro->limparErro();
@@ -338,7 +338,11 @@ abstract class Modelo
     private function executarCadastro(): bool
     {
         if (!$this->cadastrar($this->armazenar())) {
-            $this->mensagem->erro('Erro de sistema ao tentar cadastrar os dados.')->flash();
+            $mensagem = $this->erro->obter();
+            $this->mensagem->erro($mensagem)->flash();
+            
+            $this->erro->limparErro();
+
             return false;
         }
 
