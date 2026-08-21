@@ -3,6 +3,7 @@
 namespace sistema\modelo;
 
 use sistema\nucleo\Modelo;
+use stdClass;
 
 class Maquina extends Modelo
 {
@@ -18,7 +19,7 @@ class Maquina extends Modelo
     return $this->conection->select($query);
   }
 
-  public function cadastrarMaquina(array $dados): ?array
+  public function cadastrarMaquina(array $dados): void
   {
     $colunas = $this->buscarColunas();
     if (!$colunas) {
@@ -26,24 +27,27 @@ class Maquina extends Modelo
       $this->mensagem->erro($mensagem)->flash();
     }
 
-    unset($colunas['id_machine']);
+    $permitidas = ['model', 'brand', 'designation', 'piece_operations', 'purchase_price', 'quantity'];
+    $colunas = array_values(array_intersect($colunas, $permitidas));
     
-    return var_dump($colunas);
+    $maquina = new Maquina;
+    $i=0;
+    $novosDados = [];
+    foreach ($dados as $value) {
+      $maquina->{$colunas[$i]} = $value;
+      $i++;
+    }
 
-    // for ($i=0; $i < count($colunas) ; $i++) {
-    //   if ($colunas[$i] == 'id_machine')
-    //   continue; 
-    // foreach ($colunas as $value) {
-
-    // }
+    die(var_dump($maquina->dados()));
     
-  }
-
-    
-    
-
-  }
-  //   $query = "INSERT INTO machine (model, brand, designation, piece_operations, purchase_price, quantity) VALUES (:modelo, :marca, :funcao, :operacoes, :valor, :qtd)"; // testar se funciona sem as aspas em values
+    //   $query = "INSERT INTO machine (model, brand, designation, piece_operations, purchase_price, quantity) VALUES (:modelo, :marca, :funcao, :operacoes, :valor, :qtd)"; // testar se funciona sem as aspas em values
 
   //   $this->conection->insert($query, $dados);
   //
+  }
+
+    
+    
+
+  }
+  
