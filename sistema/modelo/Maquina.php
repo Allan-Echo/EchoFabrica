@@ -29,15 +29,15 @@ class Maquina extends Modelo
     // for ($i=0; $i < count($colunas) ; $i++) {
     //   if ($colunas[$i] == 'id_machine')
     //   continue; 
-      foreach ($dados as $value) {
-        $i = 0;  
-        if ($colunas[$i] == 'id_machine')
+      $i = 0;  
+      foreach ($dados as $value) {  
+        if ($colunas[$i] === 'id_machine')
+        $i++;
         continue;
       
-        $colunas[$i] = $dados[$value];
-        $i++;
+        $colunas[$i] = $value;
       }
-      return die(print_r($colunas));
+      return die(var_dump($colunas));
     }
 
     
