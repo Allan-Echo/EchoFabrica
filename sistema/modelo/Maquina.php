@@ -26,19 +26,18 @@ class Maquina extends Modelo
       $this->mensagem->erro($mensagem)->flash();
     }
 
+    unset($colunas['id_machine']);
+    
+    return var_dump($colunas);
+
     // for ($i=0; $i < count($colunas) ; $i++) {
     //   if ($colunas[$i] == 'id_machine')
     //   continue; 
-      $i = 0;  
-      foreach ($dados as $value) {  
-        if ($colunas[$i] === 'id_machine')
-        $i++;
-        continue;
-      
-        $colunas[$i] = $value;
-      }
-      return die(var_dump($colunas));
-    }
+    // foreach ($colunas as $value) {
+
+    // }
+    
+  }
 
     
     
