@@ -470,29 +470,4 @@ abstract class Modelo
         $resultado = $this->resultado();
         return !empty($resultado) ? $resultado[0] : null;
     }
-
-    protected function buscarColunas(): bool|array
-    {
-        try {
-            $this->erro->limparErro();
-
-            // Query com SELECT buscando na tabela de metadados do MySQL
-            $sql = "SELECT COLUMN_NAME 
-                FROM information_schema.columns 
-                WHERE table_name = :tabela";
-
-            // Passamos o nome da tabela como parâmetro preparado
-            $resultado = $this->conection->select($sql, ['tabela' => $this->tabela]);
-
-            if (empty($resultado)) {
-                return [];
-            }
-
-            // Puxa apenas a coluna 'COLUMN_NAME' do resultado
-            return array_column((array)$resultado, 'COLUMN_NAME');
-        } catch (\Throwable $e) {
-            $this->erro->definir('Erro ao buscar estrutura da tabela: ' . $e->getMessage());
-            return false;
-        }
-    }
 }

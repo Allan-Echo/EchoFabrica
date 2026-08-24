@@ -18,36 +18,5 @@ class Maquina extends Modelo
     $query = "SELECT * FROM machine ORDER BY model ASC";
     return $this->conection->select($query);
   }
-
-  public function cadastrarMaquina(array $dados): void
-  {
-    $colunas = $this->buscarColunas();
-    if (!$colunas) {
-      $mensagem = $this->erro->obter();
-      $this->mensagem->erro($mensagem)->flash();
-    }
-
-    $permitidas = ['model', 'brand', 'designation', 'piece_operations', 'purchase_price', 'quantity'];
-    $colunas = array_values(array_intersect($colunas, $permitidas));
-    
-    $maquina = new Maquina;
-    $i=0;
-    $novosDados = [];
-    foreach ($dados as $value) {
-      $maquina->{$colunas[$i]} = $value;
-      $i++;
-    }
-
-    die(var_dump($maquina->dados()));
-    
-    //   $query = "INSERT INTO machine (model, brand, designation, piece_operations, purchase_price, quantity) VALUES (:modelo, :marca, :funcao, :operacoes, :valor, :qtd)"; // testar se funciona sem as aspas em values
-
-  //   $this->conection->insert($query, $dados);
-  //
-  }
-
-    
-    
-
-  }
+}
   
