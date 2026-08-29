@@ -1,0 +1,316 @@
+{
+    "advisories": {
+        "twig/twig": [
+            {
+                "advisoryId": "PKSA-8zx5-v2nz-58pb",
+                "packageName": "twig/twig",
+                "affectedVersions": "<=3.26.0",
+                "title": "Twig: Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders for a cached `Template`",
+                "cve": "CVE-2026-49981",
+                "link": "https://github.com/advisories/GHSA-529h-vh3j-85hq",
+                "reportedAt": "2026-07-01T18:55:49+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-529h-vh3j-85hq"
+                    }
+                ],
+                "severity": "high"
+            },
+            {
+                "advisoryId": "PKSA-fbvq-z33h-r2np",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+                "title": "Sandbox property allowlist bypass via the `column` filter under `SourcePolicyInterface`",
+                "cve": "CVE-2026-48808",
+                "link": "https://symfony.com/blog/cve-2026-48808-sandbox-property-allowlist-bypass-via-the-column-filter-under-sourcepolicyinterface",
+                "reportedAt": "2026-05-27T15:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-h8vq-8gpg-mhcg"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-48808.yaml"
+                    }
+                ],
+                "severity": "medium"
+            },
+            {
+                "advisoryId": "PKSA-g9zw-qxh8-pq8w",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+                "title": "Sandbox state regression in deprecated internal wrappers in `src/Resources/core.php`",
+                "cve": "CVE-2026-48805",
+                "link": "https://symfony.com/blog/cve-2026-48805-sandbox-state-regression-in-deprecated-internal-wrappers-in-src-resources-core-php",
+                "reportedAt": "2026-05-27T15:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-p42q-9prx-q5wq"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-48805.yaml"
+                    }
+                ],
+                "severity": "low"
+            },
+            {
+                "advisoryId": "PKSA-yd6k-t2gh-1m43",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+                "title": "Sandbox filter, tag and function allow-list bypass when sandbox state changes between renders",
+                "cve": "CVE-2026-46636",
+                "link": "https://symfony.com/blog/cve-2026-46636-sandbox-filter-tag-and-function-allow-list-bypass-when-sandbox-state-changes-between-renders",
+                "reportedAt": "2026-05-27T15:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-46636.yaml"
+                    }
+                ],
+                "severity": null
+            },
+            {
+                "advisoryId": "PKSA-1tmc-rt7x-12w6",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+                "title": "Sandbox `__toString()` policy bypass via dynamic mapping keys",
+                "cve": "CVE-2026-48806",
+                "link": "https://symfony.com/blog/cve-2026-48806-sandbox-tostring-policy-bypass-via-dynamic-mapping-keys",
+                "reportedAt": "2026-05-27T15:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-5v5v-ww74-355v"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-48806.yaml"
+                    }
+                ],
+                "severity": "medium"
+            },
+            {
+                "advisoryId": "PKSA-xx6c-6d96-db2w",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.27.0",
+                "title": "Sandbox `__toString()` policy bypass via `Traversable` in `join`/`replace` and `in`/`not in` operators",
+                "cve": "CVE-2026-48807",
+                "link": "https://symfony.com/blog/cve-2026-48807-sandbox-tostring-policy-bypass-via-traversable-in-join-replace-and-in-not-in-operators",
+                "reportedAt": "2026-05-27T15:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-8x9c-rmqh-456c"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-48807.yaml"
+                    }
+                ],
+                "severity": "medium"
+            },
+            {
+                "advisoryId": "PKSA-sjvz-tbbr-vwth",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+                "title": "The `spaceless` filter implicitly marks its output as safe",
+                "cve": "CVE-2026-46628",
+                "link": "https://symfony.com/cve-2026-46628",
+                "reportedAt": "2026-05-20T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-4j38-f5cw-54h7"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-46628.yaml"
+                    }
+                ],
+                "severity": "low"
+            },
+            {
+                "advisoryId": "PKSA-h8hf-ytnd-5t9q",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+                "title": "PHP code injection via `{% use %}` template name",
+                "cve": "CVE-2026-46633",
+                "link": "https://symfony.com/cve-2026-46633",
+                "reportedAt": "2026-05-20T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-7p85-w9px-jpjp"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-46633.yaml"
+                    }
+                ],
+                "severity": "critical"
+            },
+            {
+                "advisoryId": "PKSA-wwb1-81rc-pd65",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=3.0.0,<3.26.0",
+                "title": "XSS in profiler HtmlDumper via unescaped template and profile names",
+                "cve": "CVE-2026-47730",
+                "link": "https://symfony.com/cve-2026-47730",
+                "reportedAt": "2026-05-20T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-2g2g-8p8h-fgwm"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-47730.yaml"
+                    }
+                ],
+                "severity": "low"
+            },
+            {
+                "advisoryId": "PKSA-kvv6-36cr-fkzb",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+                "title": "Sandbox does not protect against resource exhaustion",
+                "cve": "CVE-2026-46627",
+                "link": "https://symfony.com/cve-2026-46627",
+                "reportedAt": "2026-05-20T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-46627.yaml"
+                    }
+                ],
+                "severity": null
+            },
+            {
+                "advisoryId": "PKSA-n14z-jjjg-g8vd",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+                "title": "Sandbox property allowlist bypass via the `column` filter (array_column on objects)",
+                "cve": "CVE-2026-46635",
+                "link": "https://symfony.com/cve-2026-46635",
+                "reportedAt": "2026-05-20T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-vcc8-phrv-43wj"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-46635.yaml"
+                    }
+                ],
+                "severity": "low"
+            },
+            {
+                "advisoryId": "PKSA-3mcc-k66d-pydb",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+                "title": "`{% sandbox %}{% include %}` skips checkSecurity() on cached templates (incomplete fix for CVE-2024-45411)",
+                "cve": "CVE-2026-46638",
+                "link": "https://symfony.com/cve-2026-46638",
+                "reportedAt": "2026-05-20T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-7fxw-r6jv-74c8"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-46638.yaml"
+                    }
+                ],
+                "severity": "medium"
+            },
+            {
+                "advisoryId": "PKSA-dpx1-78wg-1kqs",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.26.0",
+                "title": "Sandbox: multiple `__toString()` policy bypasses via unguarded string coercion points",
+                "cve": "CVE-2026-47732",
+                "link": "https://symfony.com/cve-2026-47732",
+                "reportedAt": "2026-05-20T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-pr2w-4gpj-cpq4"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2026-47732.yaml"
+                    }
+                ],
+                "severity": "high"
+            },
+            {
+                "advisoryId": "PKSA-yhcn-xrg3-68b1",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1",
+                "title": "Unguarded calls to __toString() when nesting an object into an array",
+                "cve": "CVE-2024-51754",
+                "link": "https://symfony.com/blog/cve-2024-51754-unguarded-calls-to-tostring-in-a-sandbox-when-an-object-is-in-an-array-or-an-argument-list",
+                "reportedAt": "2024-11-06T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-6377-hfv9-hqf6"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2024-51754.yaml"
+                    }
+                ],
+                "severity": "low"
+            },
+            {
+                "advisoryId": "PKSA-2wrf-1xmk-1pky",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<2.0.0|>=2.0.0,<3.0.0|>=3.0.0,<3.11.2|>=3.12.0,<3.14.1",
+                "title": "Unguarded calls to __isset() and to array-accesses when the sandbox is enabled",
+                "cve": "CVE-2024-51755",
+                "link": "https://symfony.com/blog/cve-2024-51755-unguarded-calls-to-isset-and-to-array-accesses-in-a-sandbox",
+                "reportedAt": "2024-11-06T08:00:00+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-jjxq-ff2g-95vh"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2024-51755.yaml"
+                    }
+                ],
+                "severity": "low"
+            },
+            {
+                "advisoryId": "PKSA-6319-ffpf-gx66",
+                "packageName": "twig/twig",
+                "affectedVersions": ">=1.0.0,<1.44.7|>=2.0.0,<2.16.0|>=3.0.0,<3.11.0|>=3.12.0,<3.14.0",
+                "title": "Possible sandbox bypass",
+                "cve": "CVE-2024-45411",
+                "link": "https://symfony.com/blog/twig-security-release-possible-sandbox-bypass",
+                "reportedAt": "2024-09-09T08:51:06+00:00",
+                "sources": [
+                    {
+                        "name": "GitHub",
+                        "remoteId": "GHSA-6j75-5wfj-gh66"
+                    },
+                    {
+                        "name": "FriendsOfPHP/security-advisories",
+                        "remoteId": "twig/twig/CVE-2024-45411.yaml"
+                    }
+                ],
+                "severity": "medium"
+            }
+        ]
+    },
+    "abandoned": [],
+    "filter": []
+}
