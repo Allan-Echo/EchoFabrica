@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "twig/twig": "^3.0",
+        "twig/twig": "3.28",
         "pecee/simple-router": "^5.4",
         "symfony/polyfill-php80": "^1.37"
     }
