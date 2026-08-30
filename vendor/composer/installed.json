@@ -29,7 +29,7 @@
             },
             "time": "2023-12-11T21:48:25+00:00",
             "type": "library",
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "psr-4": {
                     "Pecee\\": "src/Pecee/"
