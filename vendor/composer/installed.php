@@ -3,7 +3,7 @@
         'name' => 'allan/2a',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '6ac173cdfda4f28c8c24a512885a1610125d6834',
+        'reference' => 'f877a648daf4026c769afb601c16ca53317cc6e0',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'allan/2a' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '6ac173cdfda4f28c8c24a512885a1610125d6834',
+            'reference' => 'f877a648daf4026c769afb601c16ca53317cc6e0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
