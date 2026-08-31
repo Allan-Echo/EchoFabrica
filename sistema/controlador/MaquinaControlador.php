@@ -4,6 +4,7 @@ namespace sistema\controlador;
 
 use sistema\modelo\Maquina;
 use sistema\nucleo\Helpers;
+use sistema\nucleo\Erro;
 
 class MaquinaControlador extends AdminControlador
 {
@@ -27,21 +28,41 @@ class MaquinaControlador extends AdminControlador
 
       // Só processa se houver dados enviados via POST
       if (!empty($dados)) {
-         $erro = false;
+         $erro = new Erro();
 
          // Lista de campos que são ESTRITAMENTE OBRIGATÓRIOS
          $obrigatorios = ['modelo', 'marca', 'funcao', 'operacoes', 'qtd'];
+         $camposInteiros = ['qtd', 'valor', 'operacoes'];
+         $opcoes = array('options' => array('min_range' => 1));
 
-         foreach ($obrigatorios as $campo) {
-            if (!isset($dados[$campo]) || trim((string) $dados[$campo]) === '') {
-               $erro = true;
+         foreach ($dados as $chave => $campo) {
+            if (!isset(array_key_exists) || trim((string) $dados[$campo]) === '') {
+               $erro->definir('Campos obrigatórios em branco');
                break;
+            }
+            elseif (strlen(trim($dados[$campo])) > 255) {
+               $erro->definir('Campos obrigatórios com mais de 255 caracteres');
+               break;  
+            }   
+         }
+         
+
+         foreach ($camposInteiros as $campo) {
+            if (isset($dados[$campo])) {
+               $campoFiltrado = filter_var($dados[$campo], FILTER_VALIDATE_INT, $opcoes);
+
+               if ($campoFiltrado === false) {
+                  $erro->definir('Campos numéricos inválidos');
+                  break;
+               } else {
+                  $dados[$campo] = $campoFiltrado;
+               }
             }
          }
 
-         if ($erro) {
+         if ($erro->temErro()) {
             // Exibe o erro e NÃO redireciona (para permitir que o usuário corrija no formulário)
-            $this->mensagem->erro('Campos obrigatórios em branco')->flash();
+            $this->mensagem->erro($erro->obter())->flash();
          } else {
             // Mapeamento correto dos dados
             $maquina->model            = $dados['modelo'];
