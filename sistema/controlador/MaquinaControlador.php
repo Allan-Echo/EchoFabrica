@@ -32,21 +32,20 @@ class MaquinaControlador extends AdminControlador
 
          // Lista de campos que são ESTRITAMENTE OBRIGATÓRIOS
          $obrigatorios = ['modelo', 'marca', 'funcao', 'operacoes', 'qtd'];
-         $camposInteiros = ['qtd', 'valor', 'operacoes'];
-         $opcoes = array('options' => array('min_range' => 1));
 
-         foreach ($dados as $chave => $campo) {
-            if (!isset(array_key_exists) || trim((string) $dados[$campo]) === '') {
+         foreach ($obrigatorios as $campo) {
+            if (!isset($dados[$campo]) || trim((string) $dados[$campo]) === '') {
                $erro->definir('Campos obrigatórios em branco');
                break;
-            }
+            } 
             elseif (strlen(trim($dados[$campo])) > 255) {
                $erro->definir('Campos obrigatórios com mais de 255 caracteres');
                break;  
             }   
          }
          
-
+         $camposInteiros = ['qtd', 'valor', 'operacoes'];
+         $opcoes = array('options' => array('min_range' => 1));
          foreach ($camposInteiros as $campo) {
             if (isset($dados[$campo])) {
                $campoFiltrado = filter_var($dados[$campo], FILTER_VALIDATE_INT, $opcoes);
