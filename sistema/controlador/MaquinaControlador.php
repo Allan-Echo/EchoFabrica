@@ -29,6 +29,7 @@ class MaquinaControlador extends AdminControlador
       // Só processa se houver dados enviados via POST
       if (!empty($dados)) {
          $erro = new Erro();
+         $erro->limparErro();
 
          // Lista de campos que são ESTRITAMENTE OBRIGATÓRIOS
          $obrigatorios = ['modelo', 'marca', 'funcao', 'operacoes', 'qtd'];
@@ -37,25 +38,28 @@ class MaquinaControlador extends AdminControlador
             if (!isset($dados[$campo]) || trim((string) $dados[$campo]) === '') {
                $erro->definir('Campos obrigatórios em branco');
                break;
-            } 
-            elseif (strlen(trim($dados[$campo])) > 255) {
-               $erro->definir('Campos obrigatórios com mais de 255 caracteres');
-               break;  
-            }   
-         }
-         
-         $camposInteiros = ['qtd', 'valor', 'operacoes'];
-         $opcoes = array('options' => array('min_range' => 1));
-         foreach ($camposInteiros as $campo) {
-            if (isset($dados[$campo])) {
+            }
+            elseif($dados[$campo] === 'operacoes' || $dados[$campo] === 'qtd') {
+               $opcoes = ['options' => ['min_range' => 1]];
                $campoFiltrado = filter_var($dados[$campo], FILTER_VALIDATE_INT, $opcoes);
-
                if ($campoFiltrado === false) {
                   $erro->definir('Campos numéricos inválidos');
                   break;
-               } else {
+               }
+               else {
                   $dados[$campo] = $campoFiltrado;
                }
+            }
+         }
+
+         if (isset($dados['valor']) && trim((string) $dados['valor']) !== '') {
+            $opcoes = ['options' => ['min_range' => 0]];
+            $campoFiltrado = filter_var($dados['valor'], FILTER_VALIDATE_FLOAT, $opcoes);
+            if ($campoFiltrado === false) {
+               $erro->definir('Valor de compra inválido');
+            }
+            else {
+               $dados['valor'] = $campoFiltrado;
             }
          }
 
