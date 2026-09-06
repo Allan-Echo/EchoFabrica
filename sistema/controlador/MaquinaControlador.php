@@ -39,7 +39,7 @@ class MaquinaControlador extends AdminControlador
                $erro->definir('Campos obrigatórios em branco');
                break;
             }
-            elseif($dados[$campo] === 'operacoes' || $dados[$campo] === 'qtd') {
+            elseif($campo === 'operacoes' || $campo === 'qtd') {
                $opcoes = ['options' => ['min_range' => 1]];
                $campoFiltrado = filter_var($dados[$campo], FILTER_VALIDATE_INT, $opcoes);
                if ($campoFiltrado === false) {
@@ -75,7 +75,7 @@ class MaquinaControlador extends AdminControlador
             $maquina->quantity         = $dados['qtd'];
 
             // Trata o campo 'valor' (se vier vazio '', grava NULL ou 0 no banco)
-            $valorFormatado = trim((string)($dados['valor'] ?? ''));
+            $valorFormatado = ($dados['valor'] ?? '');
             $maquina->purchase_price = $valorFormatado !== '' ? $valorFormatado : null;
 
             // Salva no banco
