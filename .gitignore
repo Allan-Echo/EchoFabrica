@@ -1,1 +1,13 @@
 node_modules
+
+# Caches de ferramentas de qualidade de código
+.php-cs-fixer.cache
+.phpcs.cache
+
+# Relatórios gerados dinamicamente
+relatorio.md
+relatorio.html
+relatorio.txt
+relatorio.csv
+relatorio.json
+phpcs_output.json
