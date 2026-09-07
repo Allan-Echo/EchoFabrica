@@ -184,13 +184,11 @@ abstract class Modelo
     try {
        $this->erro->limparErro();
 
-        $dados = $this->filtro($dados);
-
         $colunas = implode(', ', array_keys($dados));
         $valores = ':' . implode(', :', array_keys($dados));
         $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
         
-        $this->conection->insert($query, $dados);
+        $this->id = $this->conection->insertComUltimoId($query, $dados);
 
         return true;
     } catch (\Throwable $e) {
@@ -219,7 +217,7 @@ abstract class Modelo
      */
     private function filtro (array $dados): array
     {
-        $dadosFiltrados = [];
+        /* $dadosFiltrados = [];
         foreach ($dados as $key => $value) {
             if (is_string($value)) {
                 $dadosFiltrados[$key] = trim($value);
@@ -230,9 +228,9 @@ abstract class Modelo
             } else {
                 $dadosFiltrados[$key] = $value;
             }
-        }
+        } */
 
-        return $dadosFiltrados;
+        return $dados;
     }
         /**
      * Atualiza registros na tabela do banco de dados.
@@ -416,8 +414,6 @@ abstract class Modelo
 
             return false;
         }
-
-        $this->id = $this->conection->lastInsertId();
         
         return true;
     }

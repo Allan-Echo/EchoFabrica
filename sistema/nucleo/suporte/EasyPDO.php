@@ -33,12 +33,12 @@ class EasyPDO
     // ------------------------------------------------------------------------
     private $opt_display_errors = true;
     private $opt_display_warnings = true;
-    private $opt_attr_errmode = PDO::ERRMODE_WARNING;
+    private $opt_attr_errmode = PDO::ERRMODE_EXCEPTION;
     private $opt_attr_case = PDO::CASE_NATURAL;
     private $opt_attr_oracle_nulls = PDO::NULL_NATURAL;
     private $opt_debug = true;
     // private $opt_fetch_mode = PDO::FETCH_OBJ; 
-    private $opt_fetch_mode = PDO::FETCH_ASSOC; 
+    private $opt_fetch_mode = PDO::FETCH_ASSOC;
 
     // ------------------------------------------------------------------------
     // CLASS PROPERTIES
@@ -134,7 +134,6 @@ class EasyPDO
                     $results = $command->fetchAll(PDO::FETCH_CLASS, $class);
                 }
             }
-
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
             $this->error($e->getMessage());
@@ -150,7 +149,7 @@ class EasyPDO
         //returns results
         return $results;
     }
-    
+
     // ========================================================================
     public function create($query, $parameters = null)
     {
@@ -319,7 +318,7 @@ class EasyPDO
     public function select_next_row($class = null)
     {
         // get the next row from the query generated at select_start
-        if(!isset($this->connection) || !isset($this->command) || is_null($this->command)){
+        if (!isset($this->connection) || !isset($this->command) || is_null($this->command)) {
             $this->error('Unable to return next row, because MySQL command is not prepared.');
             return null;
         }
@@ -358,13 +357,13 @@ class EasyPDO
     public function query($query, $parameters = null, $class = null)
     {
         // executes a generic query
-        if(preg_match("/^SELECT/i", trim($query))){
+        if (preg_match("/^SELECT/i", trim($query))) {
             return $this->select($query, $parameters, $class);
-        } else if(preg_match("/^INSERT/i", trim($query))){
+        } else if (preg_match("/^INSERT/i", trim($query))) {
             return $this->insert($query, $parameters);
-        } else if(preg_match("/^UPDATE/i", trim($query))){
+        } else if (preg_match("/^UPDATE/i", trim($query))) {
             return $this->update($query, $parameters);
-        } else if(preg_match("/^DELETE/i", trim($query))){
+        } else if (preg_match("/^DELETE/i", trim($query))) {
             return $this->delete($query, $parameters);
         } else {
 
@@ -383,13 +382,12 @@ class EasyPDO
                 $this->error($e->getMessage());
                 return null;
             }
-    
+
             //affected rows
             $this->affectedRows = $command->rowCount();
-    
+
             //close connection
             $this->connection = null;
-
         }
     }
 
@@ -425,24 +423,22 @@ class EasyPDO
 
     public function insertMult(array $querys)
     {
-         
+
         $this->connection->beginTransaction();
-                
-      try {
-        foreach ($querys as $query) {
-            $this->connection->exec($query);
-        }
-        $this->connection->commit();
-      } catch (\PDOException $e) {
+
+        try {
+            foreach ($querys as $query) {
+                $this->connection->exec($query);
+            }
+            $this->connection->commit();
+        } catch (\PDOException $e) {
             $this->error($e->getMessage());
             $this->connection->rollBack();
             return null;
-            
-      }
-    
-      //close connection
-      $this->connection = null;
-      
+        }
+
+        //close connection
+        $this->connection = null;
     }
     // ========================================================================
     // Extra Methods PDO
@@ -454,8 +450,28 @@ class EasyPDO
      * @param string|null $name Nome da sequência (útil para bancos como PostgreSQL)
      * @return string|false
      */
-    public function lastInsertId(?string $name = null): string|false
+    public function insertComUltimoId(string $query, ?array $parameters = null): int|false
     {
-        return $this->connection->lastInsertId($name);
+        if (!preg_match("/^INSERT/i", trim($query))) {
+            $this->error('Not a SQL INSERT statement.');
+            return false;
+        }
+
+        try {
+            $command = $this->connection->prepare($query);
+            $command->execute($parameters);
+
+            // Pega o ID antes de fechar/limpar a conexão
+            $lastId = $this->connection->lastInsertId();
+            $lastId = $lastId !== false ? (int) $lastId : false;
+
+            $this->affectedRows = $command->rowCount();
+            return $lastId;
+        } catch (\PDOException $e) {
+            $this->affectedRows = 0;
+            $this->error($e->getMessage());
+            return false;
+        }
+        $this->connection = null;
     }
-}    
+}
