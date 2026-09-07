@@ -9,6 +9,5 @@ class App
         Configuracao::inicializar();
 
         Rotas::registrar();
-
     }
 }

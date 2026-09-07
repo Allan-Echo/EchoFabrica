@@ -303,7 +303,7 @@ class EasyPDO
     // ========================================================================
     // FETCH ONE ROW AT A TIME
     // ========================================================================
-    public function select_start($query, $parameters = null)
+    public function selectStart($query, $parameters = null)
     {
         // runs a SELECT query prepared for FETCH one row at a time
         if (!preg_match('/^SELECT/i', trim($query))) {
@@ -328,7 +328,7 @@ class EasyPDO
     }
 
     // ========================================================================
-    public function select_next_row($class = null)
+    public function selectNextRow($class = null)
     {
         // get the next row from the query generated at select_start
         if (!isset($this->connection) || !isset($this->command) || is_null($this->command)) {
@@ -358,7 +358,7 @@ class EasyPDO
     }
 
     // ========================================================================
-    public function select_end()
+    public function selectEnd()
     {
         // disables command
         $this->command = null;
@@ -403,7 +403,7 @@ class EasyPDO
     }
 
     // ========================================================================
-    public function available_drivers()
+    public function availableDrivers()
     {
         // outputs the available PDO drivers
         echo '<pre>';
