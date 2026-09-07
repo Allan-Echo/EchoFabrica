@@ -3,10 +3,7 @@
     "autoload": {
         "psr-4": {
             "sistema\\": "sistema/"
-        },
-        "files": [
-            "sistema/nucleo/configuracoes.php"
-        ]
+        }
     },
     "authors": [
         {
@@ -23,6 +20,10 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "squizlabs/php_codesniffer": "^4.0"
     },
+    "config": {
+        "process-timeout": 0,
+        "disable-xdebug": true
+    },
     "scripts": {
         "cs:check": "php-cs-fixer fix --dry-run --diff",
         "cs:fix": "php-cs-fixer fix",
@@ -30,7 +31,7 @@
         "sniffer:fix": "phpcbf",
         "report:md": "php gerar_relatorio.php",
         "report:html": "phpcs --report=full --report-file=relatorio.html",
-        "fix:except": "powershell -ExecutionPolicy Bypass -File fix-except.ps1",
+        "fix:except": "powershell -ExecutionPolicy Bypass -File ./fix-except.ps1",
         "check-all": [
             "@cs:check",
             "@sniffer:check"

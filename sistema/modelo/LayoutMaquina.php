@@ -31,7 +31,7 @@ class LayoutMaquina extends Modelo
         $this->conection->insertMult($querys);
     }
 
-    public function buscarLayout_Machine(string $layout): array
+    public function buscarLayoutMachine(string $layout): array
     {
         $query = "SELECT m.id_machine, m.model, m.designation FROM {$this->tabela} AS lm JOIN machine AS m ON lm.fk_id_machine = m.id_machine WHERE fk_id_layout = $layout 
         ORDER BY fk_id_machine ASC";

@@ -3,7 +3,7 @@
 namespace sistema\nucleo\suporte;
 
 use sistema\nucleo\Helpers;
-use Twig\Lexer;
+use sistema\nucleo\Configuracao;
 
 class Template
 {
@@ -15,8 +15,8 @@ class Template
 
         $this->twig = new \Twig\Environment($loader);
 
-        $lexer = new Lexer($this->twig, [$this->helpers()]);
-        $this->twig->setLexer($lexer);
+        $this->helpers();
+        $this->globals();
     }
 
     public function rendenrizar(string $view, array $dados)
@@ -26,17 +26,22 @@ class Template
 
     private function helpers(): void
     {
-        [
-            $this->twig->addFunction(
-                new \Twig\TwigFunction('url', function (?string $url = null) {
-                    return Helpers::url($url);
-                })
-            ), // qualquer view que tenha essa função, ela sempre será chamda, se tiver o objeto Mensagem, vai renderizar, senão vai ser a view sem nenhuma mensagem flash
-             $this->twig->addFunction(
-                 new \Twig\TwigFunction('flash', function () {
-                     return Helpers::flash();
-                 })
-             )
-        ];
+        $this->twig->addFunction(
+            new \Twig\TwigFunction('url', function (?string $url = null) {
+                return Helpers::url($url);
+            })
+        );
+
+        $this->twig->addFunction(
+            new \Twig\TwigFunction('flash', function () {
+                return Helpers::flash();
+            })
+        );
+    }
+
+    private function globals(): void
+    {
+        $this->twig->addGlobal('URL_DEV', Configuracao::URL_DEV);
+        $this->twig->addGlobal('DATA_ATUAL', defined('DATA_ATUAL') ? DATA_ATUAL : '');
     }
 }

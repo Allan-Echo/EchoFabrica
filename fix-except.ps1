@@ -3,9 +3,12 @@ param (
     [string]$Ignorar
 )
 
-Write-Host "🔧 Corrigindo projeto com PHPCBF ignorando: $Ignorar..." -ForegroundColor Yellow
+# Força o PHP do processo atual e dos subprocessos a desligar o Xdebug
+$env:XDEBUG_MODE="off"
 
-# Executa o PHPCBF ignorando o parâmetro informado
+Write-Host "==> Corrigindo projeto com PHPCBF ignorando: $Ignorar..." -ForegroundColor Yellow
+
+# Executa o PHPCBF
 .\vendor\bin\phpcbf.bat --ignore=$Ignorar
 
-Write-Host "✅ Correção concluída!" -ForegroundColor Green
+Write-Host "[OK] Correcao concluida com sucesso!" -ForegroundColor Green

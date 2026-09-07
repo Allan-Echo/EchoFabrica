@@ -20,10 +20,9 @@ class UsuarioModelo extends Modelo
 
     public function login(array $dados, int $level = 1): bool
     {
-        // Busca o usuário no banco de dados pelo email fornecido, porém ele vem como um array de arrays, então é necessário pegar o primeiro elemento do array, que é o usuário que queremos e posteriormente transformá-lo em um objeto para facilitar o acesso aos seus atributos.
+
         $dadosUsuario = (new UsuarioModelo())->buscarPorEmail($dados['email']);
 
-        //Usuario é um objeto com os dados do usuário, ou null caso não exista. O operador de coalescência nula (??) verifica se o valor à esquerda é nulo e, se for, retorna o valor à direita. Nesse caso, se $dadosUsuario[0] for nulo, $usuario será nulo.
         $usuario = (object) $dadosUsuario[0] ?? null;
 
         if (!$usuario || $dados['senha'] !== $usuario->password) {

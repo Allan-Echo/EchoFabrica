@@ -32,14 +32,13 @@ class LoginControlador extends Controlador
                     Helpers::redirecionar('maquinas');
                     exit;
                 }
-
             }
         }
         echo $this->template->rendenrizar(
             'login.html',
             [
 
-        ]
+            ]
         );
     }
 }

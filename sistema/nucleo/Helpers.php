@@ -2,6 +2,8 @@
 
 namespace sistema\nucleo;
 
+use sistema\nucleo\Configuracao;
+
 //use Exception;
 
 class Helpers
@@ -20,16 +22,16 @@ class Helpers
     {
         $servidor = filter_input(INPUT_SERVER, 'SERVER_NAME', FILTER_UNSAFE_RAW);
 
-        $ambiente = ($servidor == 'localhost' ? URL_DEV : URL_PROD);
+        $ambiente = ($servidor === 'localhost' ? Configuracao::URL_DEV : Configuracao::URL_PROD);
 
-        return $ambiente.$url;
+        return $ambiente . ltrim((string) $url, '/');
     }
 
     public static function localhost(): bool
     {
         $servidor = filter_input(INPUT_SERVER, 'SERVER_NAME', FILTER_UNSAFE_RAW);
 
-        if ($servidor == 'localhost') {
+        if ($servidor === 'localhost') {
             return true;
         }
         return false;

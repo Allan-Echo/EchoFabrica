@@ -196,7 +196,6 @@ abstract class Modelo
             $this->erro->definir('Falha ao inserir no banco' . $e->getMessage());
             return false;
         }
-
     }
 
     /**
@@ -245,7 +244,6 @@ abstract class Modelo
     protected function atualizar(array $dados, string $where, array $parametros): bool
     {
         try {
-
             $this->erro->limparErro();
 
             $dados = $this->filtro($dados);
@@ -261,7 +259,7 @@ abstract class Modelo
 
             return true;
         } catch (\Throwable $e) {
-            $this->erro->definir('Erro de sistema ao atualizar dados'.$e->getMessage());
+            $this->erro->definir('Erro de sistema ao atualizar dados' . $e->getMessage());
             return false;
         }
     }

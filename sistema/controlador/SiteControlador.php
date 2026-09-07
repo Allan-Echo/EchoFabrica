@@ -70,7 +70,7 @@ class SiteControlador extends AdminControlador
         );
     }
 
-    public function produção($layout): void
+    public function producao($layout): void
     {
         $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
@@ -80,7 +80,7 @@ class SiteControlador extends AdminControlador
         echo $this->template->rendenrizar(
             'producao.html',
             [
-                'maquinas' => (new LayoutMaquina())->buscarLayout_Machine($layout),
+                'maquinas' => (new LayoutMaquina())->buscarLayoutMachine($layout),
                 'DATA_ATUAL' => DATA_ATUAL
             ]
         );
@@ -96,8 +96,7 @@ class SiteControlador extends AdminControlador
         echo $this->template->rendenrizar(
             'layouts.html',
             [
-                'layouts' => (new Layout())->buscarLayout(),
-                'URL_DEV' => URL_DEV
+                'layouts' => (new Layout())->buscarLayout()
             ]
         );
     }

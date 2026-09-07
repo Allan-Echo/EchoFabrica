@@ -16,6 +16,7 @@
 namespace sistema\nucleo\suporte;
 
 use PDO;
+use PDOException;
 
 class EasyPDO
 {
@@ -125,7 +126,6 @@ class EasyPDO
         // query execution
         // execution
         try {
-
             $command = $this->connection->prepare($query);
             if ($parameters != null) {
                 $command->execute($parameters);
@@ -182,7 +182,6 @@ class EasyPDO
         // query execution
         // execution
         try {
-
             $command = $this->connection->prepare($query);
             if ($parameters != null) {
                 $command->execute($parameters);
@@ -216,7 +215,6 @@ class EasyPDO
         // query execution
         // execution
         try {
-
             $command = $this->connection->prepare($query);
             if ($parameters != null) {
                 $command->execute($parameters);
@@ -250,7 +248,6 @@ class EasyPDO
         // query execution
         // execution
         try {
-
             $command = $this->connection->prepare($query);
             if ($parameters != null) {
                 $command->execute($parameters);
@@ -284,7 +281,6 @@ class EasyPDO
         // query execution
         // execution
         try {
-
             $command = $this->connection->prepare($query);
             if ($parameters != null) {
                 $command->execute($parameters);
@@ -318,7 +314,6 @@ class EasyPDO
         // query execution
         // execution
         try {
-
             $this->command = $this->connection->prepare($query);
             if ($parameters != null) {
                 $this->command->execute($parameters);
@@ -384,11 +379,9 @@ class EasyPDO
         } elseif (preg_match('/^DELETE/i', trim($query))) {
             return $this->delete($query, $parameters);
         } else {
-
             $command = null;
 
             try {
-
                 $command = $this->connection->prepare($query);
                 if ($parameters != null) {
                     $command->execute($parameters);
@@ -471,10 +464,10 @@ class EasyPDO
     // ========================================================================
 
     /**
-     * Retorna o último ID inserido na conexão ativa.
-     *
-     * @param string|null $name Nome da sequência (útil para bancos como PostgreSQL)
-     * @return string|false
+     * Executes an INSERT query and returns the last inserted ID.
+     * @param string $query
+     * @param array|null $parameters
+     * @return int|false
      */
     public function insertComUltimoId(string $query, ?array $parameters = null): int|false
     {

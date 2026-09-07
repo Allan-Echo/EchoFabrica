@@ -25,5 +25,4 @@ class DashboardControlador extends AdminControlador
         Helpers::redirecionar('login');
         //exit();
     }
-
 }

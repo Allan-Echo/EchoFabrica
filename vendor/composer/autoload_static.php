@@ -21,7 +21,6 @@ class ComposerStaticInit7afd3502fa83db7e0b9f0c89d2225fde
         'ffecb95d45175fd40f75be8a23b34f90' => __DIR__ . '/..' . '/twig/twig/src/Resources/debug.php',
         'c7baa00073ee9c61edf148c51917cfb4' => __DIR__ . '/..' . '/twig/twig/src/Resources/escaper.php',
         'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
-        '6f1be02643b0543d8f826d5e5f66e8a6' => __DIR__ . '/../..' . '/sistema/nucleo/configuracoes.php',
     );
 
     public static $prefixLengthsPsr4 = array (
