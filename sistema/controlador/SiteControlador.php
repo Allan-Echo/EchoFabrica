@@ -58,14 +58,14 @@ class SiteControlador extends AdminControlador
         $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
             //var_dump((new Maquina)->montarLayout($id, $dados));
-            (new LayoutMaquina)->montarLayout($id, $dados);
+            (new LayoutMaquina())->montarLayout($id, $dados);
         }
 
         echo $this->template->rendenrizar(
             'cadastrolayout.html',
             [
-                'maquinas' => (new Maquina)->buscarMaq(),
-                'layouts' => (new Layout)->filtrarLayout($id)
+                'maquinas' => (new Maquina())->buscarMaq(),
+                'layouts' => (new Layout())->filtrarLayout($id)
             ]
         );
     }
@@ -74,13 +74,13 @@ class SiteControlador extends AdminControlador
     {
         $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
-            (new Producao)->guardarProducao($layout, $dados);
+            (new Producao())->guardarProducao($layout, $dados);
         }
 
         echo $this->template->rendenrizar(
             'producao.html',
             [
-                'maquinas' => (new LayoutMaquina)->buscarLayout_Machine($layout),
+                'maquinas' => (new LayoutMaquina())->buscarLayout_Machine($layout),
                 'DATA_ATUAL' => DATA_ATUAL
             ]
         );
@@ -90,13 +90,13 @@ class SiteControlador extends AdminControlador
     {
         $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
-            (new Layout)->cadastrarLayout($dados);
+            (new Layout())->cadastrarLayout($dados);
         }
 
         echo $this->template->rendenrizar(
             'layouts.html',
             [
-                'layouts' => (new Layout)->buscarLayout(),
+                'layouts' => (new Layout())->buscarLayout(),
                 'URL_DEV' => URL_DEV
             ]
         );
@@ -108,7 +108,7 @@ class SiteControlador extends AdminControlador
         //$id = filter_input(INPUT_POST, FILTER_UNSAFE_RAW);
 
         if (!empty($id)) {
-            (new Layout)->deletar($id);
+            (new Layout())->deletar($id);
         }
 
         Helpers::redirecionar('layouts');

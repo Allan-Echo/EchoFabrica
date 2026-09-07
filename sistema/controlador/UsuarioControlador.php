@@ -2,9 +2,9 @@
 
 namespace sistema\controlador;
 
+use sistema\modelo\UsuarioModelo;
 use sistema\nucleo\Controlador;
 use sistema\nucleo\Sessao;
-use sistema\modelo\UsuarioModelo;
 
 class UsuarioControlador extends Controlador
 {
@@ -13,9 +13,10 @@ class UsuarioControlador extends Controlador
         return parent::__construct('templates/site/views');
     }
 
-    public static function usuario(): ?object {
+    public static function usuario(): ?object
+    {
         $sessao = new Sessao();
-        if(!$sessao->checar('usuarioId')) {
+        if (!$sessao->checar('usuarioId')) {
             return null;
         }
         return (new UsuarioModelo())->buscarPorId($sessao->usuarioId);

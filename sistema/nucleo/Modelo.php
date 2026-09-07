@@ -5,8 +5,8 @@ namespace sistema\nucleo;
 use sistema\nucleo\suporte\EasyPDO;
 
 abstract class Modelo
-{   
-        /**
+{
+    /**
      * @var EasyPDO Instância da conexão com o banco de dados via PDO.
      */
     protected EasyPDO $conection;
@@ -20,7 +20,7 @@ abstract class Modelo
      * @var Erro Instância para gerenciamento e captura de erros de banco/sistema.
      */
     protected Erro $erro;
-    
+
     /**
      * @var string Nome da tabela associada ao modelo no banco de dados.
      */
@@ -39,7 +39,7 @@ abstract class Modelo
     /**
      * @var array|null Parâmetros para substituição no Prepared Statement.
      */
-    protected mixed $parametros = null; 
+    protected mixed $parametros = null;
 
     /**
      * @var string|null Cláusula de ordenação (ORDER BY).
@@ -56,7 +56,7 @@ abstract class Modelo
      */
     protected int $offset = 0;
 
-    
+
     /**
      * Construtor da classe Modelo.
      *
@@ -69,14 +69,14 @@ abstract class Modelo
     {
         $this->conection = new EasyPDO();
         $this->mensagem = new Mensagem();
-        $this->erro = new Erro;
+        $this->erro = new Erro();
         $this->tabela = $tabela;
     }
 
-            /**
+    /**
      * Monta a estrutura base de uma consulta SELECT.
      *
-     * Este método utiliza uma interface fluida, permitindo o encadeamento de 
+     * Este método utiliza uma interface fluida, permitindo o encadeamento de
      * métodos como ordenar() e limitar() antes de chamar resultado().
      *
      * Exemplo:
@@ -96,7 +96,7 @@ abstract class Modelo
      */
     public function buscar(?string $where = null, ?string $parametros = null, string $coluna = '*'): static
     {
-       $this->query = "SELECT {$coluna} FROM " . $this->tabela;
+        $this->query = "SELECT {$coluna} FROM " . $this->tabela;
 
 
 
@@ -108,7 +108,7 @@ abstract class Modelo
         return $this;
     }
 
-            /**
+    /**
      * Define a cláusula de ordenação da consulta.
      *
      * @param string $ordem Cláusula ORDER BY (ex: "id DESC" ou "nome ASC, data DESC").
@@ -123,7 +123,7 @@ abstract class Modelo
         return $this;
     }
 
-            /**
+    /**
      * Define limites de paginação para a consulta.
      *
      * @param int $limite Quantidade máxima de registros.
@@ -140,7 +140,7 @@ abstract class Modelo
         return $this;
     }
 
-        /**
+    /**
      * Finaliza e executa a consulta SELECT montada.
      *
      * Este método compila todas as partes da query (WHERE, ORDER BY, LIMIT)
@@ -179,23 +179,24 @@ abstract class Modelo
      * @see filtro() Sanitiza os dados antes da persistência.
      * @see Erro::limparErro() Reseta o estado de erro antes da operação.
      */
-    protected function cadastrar(array $dados): bool {
-        
-    try {
-       $this->erro->limparErro();
+    protected function cadastrar(array $dados): bool
+    {
 
-        $colunas = implode(', ', array_keys($dados));
-        $valores = ':' . implode(', :', array_keys($dados));
-        $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
-        
-        $this->id = $this->conection->insertComUltimoId($query, $dados);
+        try {
+            $this->erro->limparErro();
 
-        return true;
-    } catch (\Throwable $e) {
-        $this->erro->definir('Falha ao inserir no banco' . $e->getMessage());
-        return false;
-    }
-        
+            $colunas = implode(', ', array_keys($dados));
+            $valores = ':' . implode(', :', array_keys($dados));
+            $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
+
+            $this->id = $this->conection->insertComUltimoId($query, $dados);
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->erro->definir('Falha ao inserir no banco' . $e->getMessage());
+            return false;
+        }
+
     }
 
     /**
@@ -215,7 +216,7 @@ abstract class Modelo
      * @see cadastrar() Chama antes de INSERT
      * @see atualizar() Chama antes de UPDATE
      */
-    private function filtro (array $dados): array
+    private function filtro(array $dados): array
     {
         /* $dadosFiltrados = [];
         foreach ($dados as $key => $value) {
@@ -232,7 +233,7 @@ abstract class Modelo
 
         return $dados;
     }
-        /**
+    /**
      * Atualiza registros na tabela do banco de dados.
      *
      * @param array $dados Dados associativos para atualização (coluna => valor).
@@ -264,7 +265,7 @@ abstract class Modelo
             return false;
         }
     }
-    
+
     /**
      * Retorna a mensagem de erro da última operação.
      *
@@ -296,7 +297,7 @@ abstract class Modelo
         return $this->mensagem;
     }
 
-        /**
+    /**
      * Retorna os dados do objeto.
      *
      * @return mixed Os dados armazenados no objeto, geralmente um stdClass ou array de resultados.
@@ -310,9 +311,9 @@ abstract class Modelo
      * Magic method que captura atribuições de propriedades dinâmicas.
      *
      * Quando você atribui valor a uma propriedade não declarada explicitamente,
-     * este método é chamado automaticamente. Armazena o atributo em um stdClass 
+     * este método é chamado automaticamente. Armazena o atributo em um stdClass
      * dentro de $this->dados para posterior persistência.
-     * 
+     *
      * Exemplo:
      * ```php
      * $usuario->nome = 'Marcos';
@@ -328,7 +329,7 @@ abstract class Modelo
      */
     public function __set(string $name, mixed $value): void
     {
-        if(empty($this->dados)) {
+        if (empty($this->dados)) {
             $this->dados = new \stdClass();
         }
         $this->dados->$name = $value;
@@ -340,7 +341,7 @@ abstract class Modelo
      * @param string $campo Nome da propriedade
      * @return bool
      */
-    public function __isset(string $campo):bool
+    public function __isset(string $campo): bool
     {
         return isset($this->dados->$campo);
     }
@@ -376,7 +377,7 @@ abstract class Modelo
         return $this->filtro($dados);
     }
 
-        /**
+    /**
      * Orquestra a persistência dos dados no banco de dados.
      *
      * Decide automaticamente entre uma operação de INSERT (novo registro)
@@ -394,10 +395,10 @@ abstract class Modelo
     }
 
 
-        /**
+    /**
      * Orquestra a persistência de um novo registro no banco de dados.
-     * 
-     * Chamado internamente pelo método salvar(). Além de cadastrar, 
+     *
+     * Chamado internamente pelo método salvar(). Além de cadastrar,
      * recupera o último ID inserido e o atribui ao objeto.
      *
      * @return bool True em caso de sucesso, false se houver falha (com mensagem flash).
@@ -409,18 +410,18 @@ abstract class Modelo
         if (!$this->cadastrar($this->armazenar())) {
             $mensagem = $this->erro->obter();
             $this->mensagem->erro($mensagem)->flash();
-            
+
             $this->erro->limparErro();
 
             return false;
         }
-        
+
         return true;
     }
 
-        /**
+    /**
      * Orquestra a atualização de um registro existente no banco de dados.
-     * 
+     *
      * Chamado internamente pelo método salvar(). Após a atualização,
      * sincroniza o objeto atual com os dados recém-salvos no banco de dados.
      *
@@ -431,12 +432,12 @@ abstract class Modelo
      */
     private function executarAtualizacao(): bool
     {
-        if (!$this->atualizar($this->armazenar(), "id = :id", ['id' => $this->id])) {
+        if (!$this->atualizar($this->armazenar(), 'id = :id', ['id' => $this->id])) {
             $mensagem = $this->erro->obter();
             $this->mensagem->erro($mensagem)->flash();
             return false;
         }
-        
+
         $atualizado = $this->buscarPorId($this->id);
         if ($atualizado) {
             $this->dados = $atualizado->dados();
@@ -462,7 +463,7 @@ abstract class Modelo
      */
     public function buscarPorId(int $id): ?object
     {
-        $this->buscar("id = :id", "id={$id}");
+        $this->buscar('id = :id', "id={$id}");
         $resultado = $this->resultado();
         return !empty($resultado) ? $resultado[0] : null;
     }

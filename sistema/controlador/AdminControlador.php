@@ -3,9 +3,8 @@
 namespace sistema\controlador;
 
 use sistema\nucleo\Controlador;
-use sistema\controlador\UsuarioControlador;
-use sistema\nucleo\Sessao;
 use sistema\nucleo\Helpers;
+use sistema\nucleo\Sessao;
 
 class AdminControlador extends Controlador
 {
@@ -14,14 +13,13 @@ class AdminControlador extends Controlador
     public function __construct()
     {
         parent::__construct('templates/site/views');
-        
+
         $this->usuario = UsuarioControlador::usuario();
-        
+
         if (!$this->usuario) {
             $this->mensagem->alerta('Você precisa estar logado para acessar essa página')->flash();
             $this->acessoNegado();
-        }
-        else if ($this->usuario->level < 3) {
+        } elseif ($this->usuario->level < 3) {
             $this->mensagem->alerta('Você não tem permissão para acessar essa página')->flash();
             $this->acessoNegado();
         }

@@ -1,4 +1,5 @@
 <?php
+
 /*
 |------------------------------------------------------------------------------
 | EasyPDO
@@ -14,7 +15,6 @@
 
 namespace sistema\nucleo\suporte;
 
-use Exception;
 use PDO;
 
 class EasyPDO
@@ -37,7 +37,7 @@ class EasyPDO
     private $opt_attr_case = PDO::CASE_NATURAL;
     private $opt_attr_oracle_nulls = PDO::NULL_NATURAL;
     private $opt_debug = true;
-    // private $opt_fetch_mode = PDO::FETCH_OBJ; 
+    // private $opt_fetch_mode = PDO::FETCH_OBJ;
     private $opt_fetch_mode = PDO::FETCH_ASSOC;
 
     // ------------------------------------------------------------------------
@@ -59,19 +59,37 @@ class EasyPDO
 
         // --------------------------------------------------------------------
         // check if the developer defined other connection options
-        if (key_exists('db_host', $options)) $this->db_host = $options['db_host'];
-        if (key_exists('db_name', $options)) $this->db_name = $options['db_name'];
-        if (key_exists('db_user', $options)) $this->db_user = $options['db_user'];
-        if (key_exists('db_pass', $options)) $this->db_pass = $options['db_pass'];
-        if (key_exists('db_char', $options)) $this->db_char = $options['db_char'];
+        if (key_exists('db_host', $options)) {
+            $this->db_host = $options['db_host'];
+        }
+        if (key_exists('db_name', $options)) {
+            $this->db_name = $options['db_name'];
+        }
+        if (key_exists('db_user', $options)) {
+            $this->db_user = $options['db_user'];
+        }
+        if (key_exists('db_pass', $options)) {
+            $this->db_pass = $options['db_pass'];
+        }
+        if (key_exists('db_char', $options)) {
+            $this->db_char = $options['db_char'];
+        }
 
         // --------------------------------------------------------------------
         // check if database connection options are available
-        if (empty($this->db_host)) $this->error('Host is empty.');
-        if (empty($this->db_name)) $this->error('Database name is empty.');
-        if (empty($this->db_user)) $this->error('Username is empty.');
+        if (empty($this->db_host)) {
+            $this->error('Host is empty.');
+        }
+        if (empty($this->db_name)) {
+            $this->error('Database name is empty.');
+        }
+        if (empty($this->db_user)) {
+            $this->error('Username is empty.');
+        }
         //if (empty($this->db_pass)) $this->warning('Username has no password defined.');
-        if (empty($this->db_char)) $this->db_char = 'utf8';
+        if (empty($this->db_char)) {
+            $this->db_char = 'utf8';
+        }
 
         // --------------------------------------------------------------------
         // establishes the connection
@@ -80,7 +98,7 @@ class EasyPDO
             $str,
             $this->db_user,
             $this->db_pass,
-            array(PDO::ATTR_PERSISTENT => true)
+            [PDO::ATTR_PERSISTENT => true]
         );
 
         // --------------------------------------------------------------------
@@ -96,7 +114,7 @@ class EasyPDO
     public function select($query, $parameters = null, $class = null)
     {
         // runs a SELECT query
-        if (!preg_match("/^SELECT/i", trim($query))) {
+        if (!preg_match('/^SELECT/i', trim($query))) {
             $this->error('Not a SQL SELECT statment.');
             return null;
         }
@@ -116,7 +134,7 @@ class EasyPDO
             }
 
             // --------------------------------------------------
-            // fetch as assoc array            
+            // fetch as assoc array
             if ($this->opt_fetch_mode == PDO::FETCH_ASSOC && $class == null) {
                 $results = $command->fetchAll(PDO::FETCH_ASSOC);
             } elseif ($this->opt_fetch_mode == PDO::FETCH_OBJ & $class == null) {
@@ -124,7 +142,7 @@ class EasyPDO
             } elseif ($class != null) {
                 if (!class_exists($class)) {
                     if ($class == null) {
-                        $this->error("Database Error: no class specified.");
+                        $this->error('Database Error: no class specified.');
                     } else {
                         $this->error("Database Error: class '$class' does not exists.");
                     }
@@ -154,7 +172,7 @@ class EasyPDO
     public function create($query, $parameters = null)
     {
         // runs an CREATE query
-        if (!preg_match("/^CREATE/i", trim($query))) {
+        if (!preg_match('/^CREATE/i', trim($query))) {
             $this->error('Not a SQL INSERT statment.');
             return null;
         }
@@ -188,7 +206,7 @@ class EasyPDO
     public function insert($query, $parameters = null)
     {
         // runs an INSERT query
-        if (!preg_match("/^INSERT/i", trim($query))) {
+        if (!preg_match('/^INSERT/i', trim($query))) {
             $this->error('Not a SQL INSERT statment.');
             return null;
         }
@@ -222,7 +240,7 @@ class EasyPDO
     public function update($query, $parameters = null)
     {
         // runs an UPDATE query
-        if (!preg_match("/^UPDATE/i", trim($query))) {
+        if (!preg_match('/^UPDATE/i', trim($query))) {
             $this->error('Not a SQL UPDATE statment.');
             return null;
         }
@@ -256,7 +274,7 @@ class EasyPDO
     public function delete($query, $parameters = null)
     {
         // runs an UPDATE query
-        if (!preg_match("/^DELETE/i", trim($query))) {
+        if (!preg_match('/^DELETE/i', trim($query))) {
             $this->error('Not a SQL DELETE statment.');
             return null;
         }
@@ -292,7 +310,7 @@ class EasyPDO
     public function select_start($query, $parameters = null)
     {
         // runs a SELECT query prepared for FETCH one row at a time
-        if (!preg_match("/^SELECT/i", trim($query))) {
+        if (!preg_match('/^SELECT/i', trim($query))) {
             $this->error('Not a SQL SELECT statment.');
             return null;
         }
@@ -324,7 +342,7 @@ class EasyPDO
         }
 
         // --------------------------------------------------
-        // fetch as assoc array            
+        // fetch as assoc array
         if ($this->opt_fetch_mode == PDO::FETCH_ASSOC && $class == null) {
             return $this->command->fetch(PDO::FETCH_ASSOC);
         } elseif ($this->opt_fetch_mode == PDO::FETCH_OBJ & $class == null) {
@@ -332,7 +350,7 @@ class EasyPDO
         } elseif ($class != null) {
             if (!class_exists($class)) {
                 if ($class == null) {
-                    $this->error("Database Error: no class specified.");
+                    $this->error('Database Error: no class specified.');
                 } else {
                     $this->error("Database Error: class '$class' does not exists.");
                 }
@@ -357,13 +375,13 @@ class EasyPDO
     public function query($query, $parameters = null, $class = null)
     {
         // executes a generic query
-        if (preg_match("/^SELECT/i", trim($query))) {
+        if (preg_match('/^SELECT/i', trim($query))) {
             return $this->select($query, $parameters, $class);
-        } else if (preg_match("/^INSERT/i", trim($query))) {
+        } elseif (preg_match('/^INSERT/i', trim($query))) {
             return $this->insert($query, $parameters);
-        } else if (preg_match("/^UPDATE/i", trim($query))) {
+        } elseif (preg_match('/^UPDATE/i', trim($query))) {
             return $this->update($query, $parameters);
-        } else if (preg_match("/^DELETE/i", trim($query))) {
+        } elseif (preg_match('/^DELETE/i', trim($query))) {
             return $this->delete($query, $parameters);
         } else {
 
@@ -403,8 +421,12 @@ class EasyPDO
     private function warning($message)
     {
         // emmits a non destructive warning message
-        if (!$this->opt_debug) return;
-        if (!$this->opt_display_errors) return;
+        if (!$this->opt_debug) {
+            return;
+        }
+        if (!$this->opt_display_errors) {
+            return;
+        }
         $class_name = explode('\\', __CLASS__);
         $class_name = end($class_name);
         echo PHP_EOL . "$class_name - WARNING - $message" . PHP_EOL;
@@ -414,8 +436,12 @@ class EasyPDO
     private function error($message)
     {
         // exits class with a destructive error
-        if (!$this->opt_debug) return;
-        if (!$this->opt_display_warnings) return;
+        if (!$this->opt_debug) {
+            return;
+        }
+        if (!$this->opt_display_warnings) {
+            return;
+        }
         $class_name = explode('\\', __CLASS__);
         $class_name = end($class_name);
         die(PHP_EOL . "$class_name - ERROR - $message" . PHP_EOL);
@@ -452,7 +478,7 @@ class EasyPDO
      */
     public function insertComUltimoId(string $query, ?array $parameters = null): int|false
     {
-        if (!preg_match("/^INSERT/i", trim($query))) {
+        if (!preg_match('/^INSERT/i', trim($query))) {
             $this->error('Not a SQL INSERT statement.');
             return false;
         }
@@ -465,13 +491,14 @@ class EasyPDO
             $lastId = $this->connection->lastInsertId();
             $lastId = $lastId !== false ? (int) $lastId : false;
 
+            $this->connection = null;
             $this->affectedRows = $command->rowCount();
+
             return $lastId;
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
             $this->error($e->getMessage());
             return false;
         }
-        $this->connection = null;
     }
 }

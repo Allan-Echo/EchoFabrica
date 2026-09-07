@@ -6,7 +6,7 @@
         },
         "files": [
             "sistema/nucleo/configuracoes.php"
-            ]
+        ]
     },
     "authors": [
         {
@@ -18,5 +18,25 @@
         "twig/twig": "3.28",
         "pecee/simple-router": "^5.4",
         "symfony/polyfill-php80": "^1.37"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "squizlabs/php_codesniffer": "^4.0"
+    },
+    "scripts": {
+        "cs:check": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix",
+        "sniffer:check": "phpcs",
+        "sniffer:fix": "phpcbf",
+        "report:md": "php gerar_relatorio.php",
+        "report:html": "phpcs --report=full --report-file=relatorio.html",
+        "check-all": [
+            "@cs:check",
+            "@sniffer:check"
+        ],
+        "fix-all": [
+            "@cs:fix",
+            "@sniffer:fix"
+        ]
     }
 }

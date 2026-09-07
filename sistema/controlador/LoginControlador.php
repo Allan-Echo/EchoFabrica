@@ -2,8 +2,8 @@
 
 namespace sistema\controlador;
 
-use sistema\nucleo\Controlador;
 use sistema\modelo\UsuarioModelo;
+use sistema\nucleo\Controlador;
 use sistema\nucleo\Helpers;
 
 class LoginControlador extends Controlador
@@ -15,14 +15,14 @@ class LoginControlador extends Controlador
 
     private function checarDados(array $dados): bool
     {
-        if (in_array('',$dados, true)) {
+        if (in_array('', $dados, true)) {
             $this->mensagem->alerta('Todos os campos são obrigatórios')->flash();
             return false;
         }
         return true;
     }
-    
-    public function login():void
+
+    public function login(): void
     {
         $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
         if (!empty($dados)) {
@@ -35,9 +35,11 @@ class LoginControlador extends Controlador
 
             }
         }
-        echo $this->template->rendenrizar('login.html',
-        [
+        echo $this->template->rendenrizar(
+            'login.html',
+            [
 
-        ]);
+        ]
+        );
     }
 }

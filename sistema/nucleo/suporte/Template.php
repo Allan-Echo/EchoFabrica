@@ -3,7 +3,6 @@
 namespace sistema\nucleo\suporte;
 
 use sistema\nucleo\Helpers;
-use Twig\TwigFunction;
 use Twig\Lexer;
 
 class Template
@@ -16,7 +15,7 @@ class Template
 
         $this->twig = new \Twig\Environment($loader);
 
-        $lexer = new Lexer($this->twig, array($this->helpers()));
+        $lexer = new Lexer($this->twig, [$this->helpers()]);
         $this->twig->setLexer($lexer);
     }
 
@@ -27,17 +26,17 @@ class Template
 
     private function helpers(): void
     {
-        array(
+        [
             $this->twig->addFunction(
                 new \Twig\TwigFunction('url', function (?string $url = null) {
                     return Helpers::url($url);
                 })
             ), // qualquer view que tenha essa função, ela sempre será chamda, se tiver o objeto Mensagem, vai renderizar, senão vai ser a view sem nenhuma mensagem flash
              $this->twig->addFunction(
-                new \Twig\TwigFunction('flash', function () {
-                    return Helpers::flash();
-                })
-            )
-        );
+                 new \Twig\TwigFunction('flash', function () {
+                     return Helpers::flash();
+                 })
+             )
+        ];
     }
 }
