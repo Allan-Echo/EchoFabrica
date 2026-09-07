@@ -1,10 +1,11 @@
+# Dependências do Node
 node_modules
 
-# Caches de ferramentas de qualidade de código
+# Caches das ferramentas de código
 .php-cs-fixer.cache
 .phpcs.cache
 
-# Relatórios gerados dinamicamente
+# Relatórios e arquivos temporários
 relatorio.md
 relatorio.html
 relatorio.txt
