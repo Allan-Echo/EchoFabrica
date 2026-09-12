@@ -4,25 +4,43 @@ namespace sistema\nucleo;
 
 class Erro
 {
-    protected ?string $erro = null;
+    protected string $mensagem;
 
-    public function definir(string $mensagem): void
+    protected string $regra;
+
+    protected string $contexto;
+
+    protected string|int $parametro;
+
+    public function definirErro(string $contexto, string $regra, string|int|null $parametros = null): void
     {
-        $this->erro = $mensagem;
+        $this->contexto = $contexto;
+        $this->regra = $regra;
+
+        if (isset($parametros) && $parametros !== '') {
+            $this->parametro = $parametros;
+        }
     }
 
-    public function obter(): ?string
+    public function definirMensagem(string $mensagem): void
     {
-        return $this->erro;
+        $this->mensagem = $mensagem;
+    }
+
+    public function __get($atributo)
+    {
+        isset($this->$atributo) ? $this->$atributo : null;
     }
 
     public function temErro(): bool
     {
-        return $this->erro !== null;
+        return $this->erro['mensagem'] !== null;
     }
 
     public function limparErro(): void
     {
-        $this->erro = null;
+        array_walk($this->erro, function (&$valor) {
+            $valor = null;
+        });
     }
 }

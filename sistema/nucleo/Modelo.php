@@ -193,7 +193,7 @@ abstract class Modelo
 
             return true;
         } catch (\Throwable $e) {
-            $this->erro->definir('Falha ao inserir no banco' . $e->getMessage());
+            $this->erro->definirMensagem('Falha ao inserir no banco' . $e->getMessage());
             return false;
         }
     }
@@ -259,7 +259,7 @@ abstract class Modelo
 
             return true;
         } catch (\Throwable $e) {
-            $this->erro->definir('Erro de sistema ao atualizar dados' . $e->getMessage());
+            $this->erro->definirMensagem('Erro de sistema ao atualizar dados' . $e->getMessage());
             return false;
         }
     }
@@ -406,7 +406,7 @@ abstract class Modelo
     private function executarCadastro(): bool
     {
         if (!$this->cadastrar($this->armazenar())) {
-            $mensagem = $this->erro->obter();
+            $mensagem = $this->erro->mensagem;
             $this->mensagem->erro($mensagem)->flash();
 
             $this->erro->limparErro();
@@ -431,7 +431,7 @@ abstract class Modelo
     private function executarAtualizacao(): bool
     {
         if (!$this->atualizar($this->armazenar(), 'id = :id', ['id' => $this->id])) {
-            $mensagem = $this->erro->obter();
+            $mensagem = $this->erro->mensagem;
             $this->mensagem->erro($mensagem)->flash();
             return false;
         }
