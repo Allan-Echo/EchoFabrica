@@ -29,7 +29,7 @@ class Erro
 
     public function __get($atributo)
     {
-        isset($this->$atributo) ? $this->$atributo : null;
+      return isset($this->$atributo) ? $this->$atributo : null;
     }
 
     public function temErro(): bool
@@ -39,8 +39,6 @@ class Erro
 
     public function limparErro(): void
     {
-        array_walk($this->erro, function (&$valor) {
-            $valor = null;
-        });
+        unset($this->mensagem);
     }
 }

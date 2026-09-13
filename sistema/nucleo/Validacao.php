@@ -34,8 +34,8 @@ abstract class Validacao
     public function __construct(array $dados)
     {
         $this->dadosBrutos = $dados;
-        $this->executar();
         $this->erro = new Erro();
+        $this->executar();
     }
 
     /**
@@ -94,6 +94,20 @@ abstract class Validacao
         return true;
     }
 
+    protected function validarTexto(string $campo, mixed $valor): bool
+    {
+        if (is_null($valor) || $valor === '') {
+            return true;
+        }
+
+        // Se a string contiver apenas dígitos numéricos, rejeita
+        if (ctype_digit((string) $valor)) {
+            return false;
+        }
+
+        return is_string($valor);
+    }
+
     protected function validarInteiro(string $campo, mixed &$valor): bool
     {
         if (is_null($valor) || $valor === '') {
@@ -115,7 +129,7 @@ abstract class Validacao
             return true;
         }
 
-        $validado = filter_var($valor, FILTER_VALIDATE_FLOAT);
+        $validado = filter_var($valor, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND);
         if ($validado === false) {
             return false;
         }

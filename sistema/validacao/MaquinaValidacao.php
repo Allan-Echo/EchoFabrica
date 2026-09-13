@@ -4,9 +4,11 @@ namespace sistema\validacao;
 
 use sistema\nucleo\Validacao;
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 class MaquinaValidacao extends Validacao
 {
-    public $dados = ['modelo' => 'abcd', 'marca' => 'php', 'funcao' => '1', 'operacoes' => '2', 'qtd' => '3', 'valor' => '100,50'];
+    public $dados = ['modelo' => 2, 'marca' => 'php', 'funcao' => '1', 'operacoes' => '2', 'qtd' => '3', 'valor' => '100,50'];
 
     public function __construct(array $dados)
     {
