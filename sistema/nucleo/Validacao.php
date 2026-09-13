@@ -46,6 +46,9 @@ abstract class Validacao
         $this->erro->limparErro();
 
         foreach ($this->regras as $campo => $regrasString) {
+            if (isset($this->erro->mensagem)) {
+                break;
+            }
             $valor = $this->dadosBrutos[$campo] ?? null;
             $listaRegras = explode('|', $regrasString);
 

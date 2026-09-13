@@ -29,7 +29,12 @@ class Erro
 
     public function __get($atributo)
     {
-      return isset($this->$atributo) ? $this->$atributo : null;
+        return isset($this->$atributo) ? $this->$atributo : null;
+    }
+
+    public function __isset($atributo)
+    {
+        return isset($this->$atributo);
     }
 
     public function temErro(): bool

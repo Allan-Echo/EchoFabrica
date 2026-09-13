@@ -8,17 +8,15 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 class MaquinaValidacao extends Validacao
 {
-    public $dados = ['modelo' => 2, 'marca' => 'php', 'funcao' => '1', 'operacoes' => '2', 'qtd' => '3', 'valor' => '100,50'];
-
     public function __construct(array $dados)
     {
         return parent::__construct($dados);
     }
 
     protected array $regras = [
-        'modelo'    => 'requirido',
-        'marca'     => 'requirido',
-        'funcao'    => 'requirido',
+        'modelo'    => 'requirido|texto|max:255',
+        'marca'     => 'requirido|texto|max:255',
+        'funcao'    => 'requirido|texto|max:255',
         'operacoes' => 'requirido|inteiro|min:1',
         'qtd'       => 'requirido|inteiro|min:1',
         'valor'     => 'float|min:0'

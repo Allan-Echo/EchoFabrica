@@ -1,6 +1,9 @@
 # Dependências do Node
 node_modules
 
+# Dependências do Composer
+vendor
+
 # Caches das ferramentas de código
 .php-cs-fixer.cache
 .phpcs.cache
@@ -12,3 +15,9 @@ relatorio.txt
 relatorio.csv
 relatorio.json
 phpcs_output.json
+
+#outros
+cookie.txt
+gerar_relatorio.php
+fix-except.ps1
+teste.php
