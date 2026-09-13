@@ -3,6 +3,7 @@ node_modules
 
 # Dependências do Composer
 vendor
+composer-audit.json
 
 # Caches das ferramentas de código
 .php-cs-fixer.cache

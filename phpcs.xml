@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset name="ProjetoFabrica">
+    <description>Regras de validação PSR-12 para o projeto</description>
+
+    <!-- Aponta para as pastas de código do seu projeto -->
+    <file>sistema</file>
+
+    <!-- Ignora a pasta vendor -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- Exibe o progresso (p) e cores no terminal -->
+    <arg value="p"/>
+    <arg name="colors"/>
+
+    <!-- Define a norma PSR-12 como padrão -->
+    <rule ref="PSR12"/>
+</ruleset>
