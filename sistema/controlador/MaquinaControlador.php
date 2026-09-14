@@ -3,8 +3,8 @@
 namespace sistema\controlador;
 
 use sistema\modelo\Maquina;
-use sistema\nucleo\Erro;
 use sistema\nucleo\Helpers;
+use sistema\validacao\MaquinaValidacao;
 
 class MaquinaControlador extends AdminControlador
 {
@@ -20,67 +20,37 @@ class MaquinaControlador extends AdminControlador
 
     public function cadastroMaq(): void
     {
-        $maquina = new Maquina();
 
         // Recebe dados enviados via POST do formulário de cadastro
         $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
 
         // Só processa se houver dados enviados via POST
         if (!empty($dados)) {
-            // $erro = new Erro(); precisa ser o objeto erro dentro do objeto validador
-            // $erro->limparErro();
-
-            // Lista de campos que são ESTRITAMENTE OBRIGATÓRIOS
-            $obrigatorios = ['modelo', 'marca', 'funcao', 'operacoes', 'qtd'];
-
-            foreach ($obrigatorios as $campo) {
-                if (!isset($dados[$campo]) || trim((string) $dados[$campo]) === '') {
-                    // $erro->definir('Campos obrigatórios em branco');
-                    break;
-                } elseif ($campo === 'operacoes' || $campo === 'qtd') {
-                    $opcoes = ['options' => ['min_range' => 1]];
-                    $campoFiltrado = filter_var($dados[$campo], FILTER_VALIDATE_INT, $opcoes);
-                    if ($campoFiltrado === false) {
-                        // $erro->definir('Campos numéricos inválidos');
-                        break;
-                    } else {
-                        $dados[$campo] = $campoFiltrado;
-                    }
-                }
-            }
-
-            if (isset($dados['valor']) && trim((string) $dados['valor']) !== '') {
-                $opcoes = ['options' => ['min_range' => 0]];
-                $campoFiltrado = filter_var($dados['valor'], FILTER_VALIDATE_FLOAT, $opcoes);
-                if ($campoFiltrado === false) {
-                    // $erro->definir('Valor de compra inválido');
-                } else {
-                    $dados['valor'] = $campoFiltrado;
-                }
-            }
-
-            if (true/*$erro->temErro()*/) {
-                // Exibe o erro e NÃO redireciona (para permitir que o usuário corrija no formulário)
-                // $this->mensagem->erro($erro->obter())->flash();
+            $validacao = new MaquinaValidacao($dados);
+            if ($validacao->falhou()) {
+                $this->mensagem->erro($validacao->primeiroErro())->flash();
             } else {
-                // Mapeamento correto dos dados
-                $maquina->model            = $dados['modelo'];
-                $maquina->brand            = $dados['marca'];
-                $maquina->designation      = $dados['funcao'];
-                $maquina->piece_operations = $dados['operacoes'];
-                $maquina->quantity         = $dados['qtd'];
+                try {
+                    $maquina = new Maquina();
+                    $dadosValidados = $validacao->dados();
+                    // Mapeamento correto dos dados
+                    $maquina->model            = $dadosValidados['modelo'];
+                    $maquina->brand            = $dadosValidados['marca'];
+                    $maquina->designation      = $dadosValidados['funcao'];
+                    $maquina->piece_operations = $dadosValidados['operacoes'];
+                    $maquina->quantity         = $dadosValidados['qtd'];
+                    $maquina->purchase_price   = $dadosValidados['valor'] ?? null;
+                    // Salva no banco
+                    $maquina->salvar();
 
-                // Trata o campo 'valor' (se vier vazio '', grava NULL ou 0 no banco)
-                $valorFormatado = ($dados['valor'] ?? '');
-                $maquina->purchase_price = $valorFormatado !== '' ? $valorFormatado : null;
+                    // SÓ EXIBE SUCESSO E REDIRECIONA SE REALMENTE SALVOU
+                    $this->mensagem->sucesso('Máquina cadastrada com sucesso')->flash();
+                    Helpers::redirecionar('maquinas');
+                    exit();
 
-                // Salva no banco
-                $maquina->salvar();
-
-                // SÓ EXIBE SUCESSO E REDIRECIONA SE REALMENTE SALVOU
-                $this->mensagem->sucesso('Máquina cadastrada com sucesso')->flash();
-                Helpers::redirecionar('maquinas');
-                exit();
+                } catch (\Throwable $th) {
+                    return;
+                }
             }
         }
 

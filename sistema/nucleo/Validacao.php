@@ -114,6 +114,7 @@ abstract class Validacao
     protected function validarInteiro(string $campo, mixed &$valor): bool
     {
         if (is_null($valor) || $valor === '') {
+            $valor = null;
             return true; // Se for opcional e estiver vazio, ignora. Use 'requirido' junto para obrigatoriedade.
         }
 
@@ -128,16 +129,26 @@ abstract class Validacao
 
     protected function validarFloat(string $campo, mixed &$valor): bool
     {
-        if (is_null($valor) || $valor === '') {
+        if (is_null($valor) || (is_string($valor) && trim($valor) === '')) {
+            $valor = null;
             return true;
         }
 
-        $validado = filter_var($valor, FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND);
+        $valorSanitizado = $valor;
+
+        // Se for string no formato brasileiro (ex: 3.450,00 ou 1500,50)
+        if (is_string($valorSanitizado)) {
+            // Remove pontos de milhar e substitui a vírgula decimal por ponto
+            $valorSanitizado = str_replace(['.', ','], ['', '.'], $valorSanitizado);
+        }
+
+        $validado = filter_var($valorSanitizado, FILTER_VALIDATE_FLOAT);
+
         if ($validado === false) {
             return false;
         }
 
-        $valor = $validado; // Atualiza para o tipo float nativo do PHP
+        $valor = $validado; // Atualiza para float real (ex: 3450.0)
         return true;
     }
 
