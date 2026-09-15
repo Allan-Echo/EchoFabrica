@@ -169,14 +169,9 @@ abstract class Modelo
      * Insere um novo registro na tabela do banco de dados.
      *
      * Método protegido que prepara e executa a inserção. Realiza a limpeza de erros prévios,
-     * sanitiza os dados através do método filtro() e trata exceções capturadas
      * durante a execução da query INSERT.
-     *
      * @param array $dados Dados associativos (coluna => valor) para inserção.
-     *
      * @return bool Retorna true em caso de sucesso ou false em caso de falha.
-     *
-     * @see filtro() Sanitiza os dados antes da persistência.
      * @see Erro::limparErro() Reseta o estado de erro antes da operação.
      */
     protected function cadastrar(array $dados): bool
@@ -198,40 +193,7 @@ abstract class Modelo
         }
     }
 
-    /**
-     * Sanitiza e normaliza dados antes de persistência.
-     *
-     * Chamado por cadastrar() e atualizar().
-     * Aplica filtros conforme o tipo:
-     * - Strings: trim() remove espaços
-     * - Inteiros: FILTER_SANITIZE_NUMBER_INT
-     * - Floats: FILTER_SANITIZE_NUMBER_FLOAT
-     * - Outros: mantém valor original
-     *
-     * @param array $dados Array associativo com dados a filtrar
-     *
-     * @return array Array com dados sanitizados
-     *
-     * @see cadastrar() Chama antes de INSERT
-     * @see atualizar() Chama antes de UPDATE
-     */
-    private function filtro(array $dados): array
-    {
-        /* $dadosFiltrados = [];
-        foreach ($dados as $key => $value) {
-            if (is_string($value)) {
-                $dadosFiltrados[$key] = trim($value);
-            } elseif (is_int($value)) {
-                $dadosFiltrados[$key] = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-            } elseif (is_float($value)) {
-                $dadosFiltrados[$key] = filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, [FILTER_FLAG_ALLOW_FRACTION|FILTER_FLAG_ALLOW_THOUSAND]);
-            } else {
-                $dadosFiltrados[$key] = $value;
-            }
-        } */
 
-        return $dados;
-    }
     /**
      * Atualiza registros na tabela do banco de dados.
      *
@@ -239,14 +201,13 @@ abstract class Modelo
      * @param string $where Condição para atualização (ex: "id = :id").
      * @param array $parametros Valores dos parâmetros da condição WHERE.
      * @return bool True em caso de sucesso, false em caso de falha.
-     * @see filtro() Os dados são automaticamente sanitizados antes do UPDATE.
      */
     protected function atualizar(array $dados, string $where, array $parametros): bool
     {
         try {
             $this->erro->limparErro();
 
-            $dados = $this->filtro($dados);
+            $dados = $this->$dados;
 
             $set = [];
             foreach ($dados as $key => $value) {
@@ -322,8 +283,8 @@ abstract class Modelo
      *
      * @return void
      *
-     * @see armazenar() Converte dados dinâmicos em array
-     * @see salvar() Usa armazenar() para preparar dados
+    * @see dadosComoArray() Converte dados dinâmicos em array
+    * @see salvar() Usa dadosComoArray() para preparar dados
      */
     public function __set(string $name, mixed $value): void
     {
@@ -361,18 +322,14 @@ abstract class Modelo
      *
      * Funciona como adaptador entre o objeto $this->dados (criado via __set)
      * e os métodos cadastrar() e atualizar() que requerem arrays.
-     * Também chama filtro() para sanitizar valores.
      *
      * @return array Array associativo com dados sanitizados
-     *
      * @see __set() Cria os dados dinâmicos
-     * @see filtro() Sanitiza antes de retornar
      * @see salvar() Chama este método para preparar dados
      */
-    protected function armazenar(): array
+    protected function dadosComoArray(): array
     {
-        $dados = (array) $this->dados;
-        return $this->filtro($dados);
+        return $dados = (array) $this->dados;
     }
 
     /**
@@ -405,7 +362,7 @@ abstract class Modelo
      */
     private function executarCadastro(): bool
     {
-        if (!$this->cadastrar($this->armazenar())) {
+        if (!$this->cadastrar($this->dadosComoArray())) {
             $mensagem = $this->erro->mensagem;
             $this->mensagem->erro($mensagem)->flash();
 
@@ -430,7 +387,7 @@ abstract class Modelo
      */
     private function executarAtualizacao(): bool
     {
-        if (!$this->atualizar($this->armazenar(), 'id = :id', ['id' => $this->id])) {
+        if (!$this->atualizar($this->dadosComoArray(), 'id = :id', ['id' => $this->id])) {
             $mensagem = $this->erro->mensagem;
             $this->mensagem->erro($mensagem)->flash();
             return false;

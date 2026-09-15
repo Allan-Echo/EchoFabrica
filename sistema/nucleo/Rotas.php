@@ -27,7 +27,7 @@ class Rotas
             // 3. Rotas Protegidas / Internas
             SimpleRouter::match(['get', 'post'], Configuracao::BASE_ROUTE . 'producao/{layout}', 'SiteControlador@producao');
             SimpleRouter::get(Configuracao::BASE_ROUTE . 'maquinas', 'MaquinaControlador@maquinas');
-            SimpleRouter::match(['get', 'post'], Configuracao::BASE_ROUTE . 'maquinas/cadastro', 'MaquinaControlador@cadastroMaq');
+            SimpleRouter::match(['get', 'post'], Configuracao::BASE_ROUTE . 'maquinas/cadastro', 'MaquinaControlador@cadastroMaquina');
 
             // 4. Rotas para Layouts
             SimpleRouter::match(['get', 'post'], Configuracao::BASE_ROUTE . 'layouts/montar/{id}', 'SiteControlador@montarLayout');

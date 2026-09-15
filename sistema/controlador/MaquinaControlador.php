@@ -18,15 +18,17 @@ class MaquinaControlador extends AdminControlador
         );
     }
 
-    public function cadastroMaq(): void
+    public function cadastroMaquina(): void
     {
 
         // Recebe dados enviados via POST do formulário de cadastro
-        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
+        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?? $_POST;
 
         // Só processa se houver dados enviados via POST
         if (!empty($dados)) {
+
             $validacao = new MaquinaValidacao($dados);
+
             if ($validacao->falhou()) {
                 $this->mensagem->erro($validacao->primeiroErro())->flash();
             } else {
