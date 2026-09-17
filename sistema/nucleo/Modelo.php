@@ -177,20 +177,20 @@ abstract class Modelo
     protected function cadastrar(array $dados): bool
     {
 
-        try {
-            $this->erro->limparErro();
+        //try {
+        $this->erro->limparErro();
 
-            $colunas = implode(', ', array_keys($dados));
-            $valores = ':' . implode(', :', array_keys($dados));
-            $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
+        $colunas = implode(', ', array_keys($dados));
+        $valores = ':' . implode(', :', array_keys($dados));
+        $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
 
-            $this->id = $this->conection->insertComUltimoId($query, $dados);
+        $this->id = $this->conection->insertComUltimoId($query, $dados);
 
-            return true;
-        } catch (\Throwable $e) {
+        return true;
+        /* } catch (\Throwable $e) {
             $this->erro->definirMensagem('Falha ao inserir no banco.');
             throw $e;
-        }
+        } */
     }
 
 

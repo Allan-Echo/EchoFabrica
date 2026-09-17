@@ -473,21 +473,21 @@ class EasyPDO
             return false;
         }
 
-        try {
-            $command = $this->connection->prepare($query);
-            $command->execute($parameters);
+        //try {
+        $command = $this->connection->prepare($query);
+        $command->execute($parameters);
 
-            // Pega o ID antes de fechar/limpar a conexão
-            $lastId = $this->connection->lastInsertId();
-            $lastId = $lastId !== false ? (int) $lastId : false;
+        // Pega o ID antes de fechar/limpar a conexão
+        $lastId = $this->connection->lastInsertId();
+        $lastId = $lastId !== false ? (int) $lastId : false;
 
-            $this->connection = null;
-            $this->affectedRows = $command->rowCount();
+        $this->connection = null;
+        $this->affectedRows = $command->rowCount();
 
-            return $lastId;
-        } catch (\PDOException $e) {
+        return $lastId;
+        /* } catch (\PDOException $e) {
             $this->affectedRows = 0;
             throw $e;
-        }
+        } */
     }
 }

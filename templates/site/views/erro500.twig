@@ -15,11 +15,49 @@
           Algo deu errado ao processar sua solicitação.  
           Tente novamente mais tarde ou entre em contato com o suporte.
         </p>
-        <a href="{{ url('dashboard') }}" class="btn btn-outline-danger mt-3">
-          <i class="bi bi-arrow-left-circle me-1"></i>
-          Voltar ao painel
-        </a>
+        <div class="mt-4">
+          <a href="{{ url('dashboard') }}" class="btn btn-outline-danger me-2">
+            <i class="bi bi-arrow-left-circle me-1"></i>
+            Voltar ao painel
+          </a>
+          <!-- Botão para abrir modal de reportar erro -->
+          <button type="button" class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#modalReportarErro">
+            <i class="bi bi-chat-dots-fill me-1"></i>
+            Reportar Erro
+          </button>
+        </div>
       </div>
     </div>
   </main>
+
+  <!-- Modal de Reportar Erro -->
+  <div class="modal fade" id="modalReportarErro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">
+            <i class="bi bi-chat-dots-fill me-2"></i>
+            Reportar Erro
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{{ url('suporte/reportar-erro') }}">
+            <div class="mb-3">
+              <label for="descricaoErro" class="form-label">Descreva o problema:</label>
+              <textarea class="form-control" id="descricaoErro" name="descricaoErro" rows="4" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="emailUsuario" class="form-label">Seu e-mail (opcional):</label>
+              <input type="email" class="form-control" id="emailUsuario" name="emailUsuario">
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-info text-white">Enviar Relato</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
