@@ -26,14 +26,15 @@ class MaquinaControlador extends AdminControlador
 
         // Só processa se houver dados enviados via POST
         if (!empty($dados)) {
-
             $validacao = new MaquinaValidacao($dados);
 
             if ($validacao->falhou()) {
                 $this->mensagem->erro($validacao->primeiroErro())->flash();
             } else {
+
                 try {
                     $maquina = new Maquina();
+
                     $dadosValidados = $validacao->dados();
                     // Mapeamento correto dos dados
                     $maquina->model            = $dadosValidados['modelo'];
@@ -49,8 +50,11 @@ class MaquinaControlador extends AdminControlador
                     $this->mensagem->sucesso('Máquina cadastrada com sucesso')->flash();
                     Helpers::redirecionar('maquinas');
                     exit();
-
                 } catch (\Throwable $th) {
+                    error_log((string) $th);
+                    $this->mensagem
+                    ->erro('Não foi possível cadastrar a máquina. Tente novamente.')
+                    ->flash();
                     return;
                 }
             }

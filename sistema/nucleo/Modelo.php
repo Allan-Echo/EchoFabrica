@@ -188,8 +188,8 @@ abstract class Modelo
 
             return true;
         } catch (\Throwable $e) {
-            $this->erro->definirMensagem('Falha ao inserir no banco' . $e->getMessage());
-            return false;
+            $this->erro->definirMensagem('Falha ao inserir no banco.');
+            throw $e;
         }
     }
 
@@ -220,8 +220,8 @@ abstract class Modelo
 
             return true;
         } catch (\Throwable $e) {
-            $this->erro->definirMensagem('Erro de sistema ao atualizar dados' . $e->getMessage());
-            return false;
+            $this->erro->definirMensagem('Erro de sistema ao atualizar dados.');
+            throw $e;
         }
     }
 
@@ -236,9 +236,9 @@ abstract class Modelo
      *
      * @see mensagem() Retorna objeto Mensagem para mais controle
      */
-    public function erro(): Erro
+    public function erro(): string
     {
-        return $this->erro;
+        return $this->erro->mensagem;
     }
 
     /**
@@ -251,9 +251,9 @@ abstract class Modelo
      *
      * @see erro() Retorna apenas a mensagem de erro anterior
      */
-    public function mensagem(): Mensagem
+    public function mensagemDeErro(string $mensagem): Mensagem
     {
-        return $this->mensagem;
+        return $this->mensagem->erro($mensagem);
     }
 
     /**
@@ -343,6 +343,7 @@ abstract class Modelo
      * @see executarCadastro() Chamado se não houver ID.
      * @see executarAtualizacao() Chamado se houver ID.
      * @see erro() Caso retorne false, verifique o erro aqui.
+     *  @throws \Throwable
      */
     public function salvar(): bool
     {
@@ -362,16 +363,7 @@ abstract class Modelo
      */
     private function executarCadastro(): bool
     {
-        if (!$this->cadastrar($this->dadosComoArray())) {
-            $mensagem = $this->erro->mensagem;
-            $this->mensagem->erro($mensagem)->flash();
-
-            $this->erro->limparErro();
-
-            return false;
-        }
-
-        return true;
+        return $this->cadastrar($this->dadosComoArray());
     }
 
     /**
@@ -387,11 +379,7 @@ abstract class Modelo
      */
     private function executarAtualizacao(): bool
     {
-        if (!$this->atualizar($this->dadosComoArray(), 'id = :id', ['id' => $this->id])) {
-            $mensagem = $this->erro->mensagem;
-            $this->mensagem->erro($mensagem)->flash();
-            return false;
-        }
+        $this->atualizar($this->dadosComoArray(), 'id = :id', ['id' => $this->id]);
 
         $atualizado = $this->buscarPorId($this->id);
         if ($atualizado) {

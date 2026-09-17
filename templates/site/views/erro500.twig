@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block card %}
+  {{ flash() }}
+  <main class="container my-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-danger text-white">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Ocorreu um erro interno
+        </h5>
+      </div>
+      <div class="card-body text-center py-5">
+        <p class="fs-5 text-muted">
+          Algo deu errado ao processar sua solicitação.  
+          Tente novamente mais tarde ou entre em contato com o suporte.
+        </p>
+        <a href="{{ url('dashboard') }}" class="btn btn-outline-danger mt-3">
+          <i class="bi bi-arrow-left-circle me-1"></i>
+          Voltar ao painel
+        </a>
+      </div>
+    </div>
+  </main>
+{% endblock %}

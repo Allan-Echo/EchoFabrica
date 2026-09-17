@@ -55,7 +55,9 @@ class EasyPDO
         // check if PDO module is available
         $modules = get_loaded_extensions();
         if (!in_array('PDO', $modules) || !in_array('pdo_mysql', $modules)) {
-            die('PDO or pdo_mysql modules are not available.');
+            throw new \RuntimeException(
+                'PDO ou pdo_mysql não estão disponíveis.'
+            );
         }
 
         // --------------------------------------------------------------------
@@ -154,8 +156,7 @@ class EasyPDO
             }
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
-            $this->error($e->getMessage());
-            return null;
+            throw $e;
         }
 
         //affected rows
@@ -190,8 +191,7 @@ class EasyPDO
             }
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
-            $this->error($e->getMessage());
-            return null;
+            throw $e;
         }
 
         //affected rows
@@ -223,8 +223,7 @@ class EasyPDO
             }
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
-            $this->error($e->getMessage());
-            return null;
+            throw $e;
         }
 
         //affected rows
@@ -256,8 +255,7 @@ class EasyPDO
             }
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
-            $this->error($e->getMessage());
-            return null;
+            throw $e;
         }
 
         //affected rows
@@ -289,8 +287,7 @@ class EasyPDO
             }
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
-            $this->error($e->getMessage());
-            return null;
+            throw $e;
         }
 
         //affected rows
@@ -322,8 +319,7 @@ class EasyPDO
             }
         } catch (\PDOException $e) {
             $this->command = null;
-            $this->error($e->getMessage());
-            return null;
+            throw $e;
         }
     }
 
@@ -390,8 +386,7 @@ class EasyPDO
                 }
             } catch (\PDOException $e) {
                 $this->affectedRows = 0;
-                $this->error($e->getMessage());
-                return null;
+                throw $e;
             }
 
             //affected rows
@@ -426,18 +421,18 @@ class EasyPDO
     }
 
     // ========================================================================
-    private function error($message)
+    private function error(string $message): never
     {
-        // exits class with a destructive error
-        if (!$this->opt_debug) {
-            return;
-        }
-        if (!$this->opt_display_warnings) {
-            return;
-        }
         $class_name = explode('\\', __CLASS__);
         $class_name = end($class_name);
-        die(PHP_EOL . "$class_name - ERROR - $message" . PHP_EOL);
+
+        if (!$this->opt_debug) {
+            throw new \RuntimeException('Erro interno no EasyPDO.');
+        }
+
+        throw new \RuntimeException(
+            PHP_EOL . $class_name . ' - ERROR - ' . $message . PHP_EOL
+        );
     }
 
     public function insertMult(array $querys)
@@ -451,9 +446,11 @@ class EasyPDO
             }
             $this->connection->commit();
         } catch (\PDOException $e) {
-            $this->error($e->getMessage());
-            $this->connection->rollBack();
-            return null;
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
+            throw $e;
         }
 
         //close connection
@@ -490,8 +487,7 @@ class EasyPDO
             return $lastId;
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
-            $this->error($e->getMessage());
-            return false;
+            throw $e;
         }
     }
 }

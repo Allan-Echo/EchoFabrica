@@ -36,6 +36,9 @@ class Rotas
 
             // 5. Rota de Erro
             SimpleRouter::get(Configuracao::BASE_ROUTE . '404', 'SiteControlador@erro404');
+            SimpleRouter::get(Configuracao::BASE_ROUTE . 'erro500', 'ExceptionControlador@erro500');
+            SimpleRouter::get(Configuracao::BASE_ROUTE . 'erro/debug', 'ExceptionControlador@erroDebug');
+
 
             SimpleRouter::start();
         } catch (NotFoundHttpException $e) {
