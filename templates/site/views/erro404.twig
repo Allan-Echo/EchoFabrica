@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block card %}
+  <main class="container my-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-info text-white">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-scissors me-2"></i>
+          Página não encontrada (Erro 404)
+        </h5>
+      </div>
+      <div class="card-body text-center py-5">
+        <p class="fs-5 text-muted">
+          Parece que este molde não existe em nossa coleção.  
+          A página que você procura pode ter sido removida ou nunca costurada.
+        </p>
+
+        <!-- Ícone ilustrativo -->
+        <div class="my-4">
+          <i class="bi bi-shirt text-info" style="font-size: 4rem;"></i>
+        </div>
+
+        <div class="mt-4">
+          <a href="{{ url('dashboard') }}" class="btn btn-outline-info me-2">
+            <i class="bi bi-arrow-left-circle me-1"></i>
+            Voltar ao painel
+          </a>
+          <a href="{{ url('site/index') }}" class="btn btn-primary">
+            <i class="bi bi-house-door-fill me-1"></i>
+            Ir para página inicial
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

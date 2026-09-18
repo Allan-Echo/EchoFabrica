@@ -30,8 +30,24 @@ class TratadorExcecao
             $excecao->getTraceAsString()
         ));
 
-        http_response_code(500);
+        if ($excecao instanceof \Pecee\SimpleRouter\Exceptions\NotFoundHttpException) {
+            http_response_code(404);
+            if ($this->debug) {
+                (new Sessao())->criar('erro_debug', [
+                    'mensagem' => $excecao->getMessage(),
+                    'arquivo'  => $excecao->getFile(),
+                    'linha'    => $excecao->getLine(),
+                    'trace'    => $excecao->getTraceAsString(),
+                ]);
+                Helpers::redirecionar('erro/debug');
+                return;
+            }
+            Helpers::redirecionar('erro404');
+            return;
+        }
 
+        // fallback para 500
+        http_response_code(500);
         if ($this->debug) {
             (new Sessao())->criar('erro_debug', [
                 'mensagem' => $excecao->getMessage(),

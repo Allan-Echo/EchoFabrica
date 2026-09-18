@@ -16,6 +16,11 @@ class ExceptionControlador extends AdminControlador
         ]);
     }
 
+    public function erro404()
+    {
+        echo $this->template->rendenrizar('404.twig', []);
+    }
+
     public function erroDebug(): void
     {
         $sessao = new Sessao();
