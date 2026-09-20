@@ -2,10 +2,16 @@
 
 namespace sistema\controlador;
 
+use sistema\nucleo\Controlador;
 use sistema\nucleo\Sessao;
 
-class ExceptionControlador extends AdminControlador
+class ExceptionControlador extends Controlador
 {
+    public function __construct()
+    {
+        parent::__construct('templates/site/views');
+    }
+
     public function erro500(): void
     {
         /* Aqui é uma mensagem que vai ser renderizada.
