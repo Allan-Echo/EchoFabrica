@@ -24,12 +24,13 @@ class ExceptionControlador extends Controlador
 
     public function erro404()
     {
-        echo $this->template->rendenrizar('404.twig', []);
+        echo $this->template->rendenrizar('erro404.twig', []);
     }
 
     public function erroDebug(): void
     {
         $sessao = new Sessao();
-        echo $this->template->rendenrizar('erroDebug.twig', (array) $sessao->erro_debug);
+        echo $this->template->rendenrizar('erroDebug.twig', (array) $sessao->erroDebug);
+        exit();
     }
 }
