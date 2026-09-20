@@ -42,7 +42,7 @@ class TratadorExcecao
                 Helpers::redirecionar('erro/debug');
                 return;
             }
-            Helpers::redirecionar('erro404');
+            Helpers::redirecionar('404');
             return;
         }
 
