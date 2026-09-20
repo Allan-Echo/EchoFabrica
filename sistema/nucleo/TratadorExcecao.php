@@ -33,7 +33,7 @@ class TratadorExcecao
         if ($excecao instanceof \Pecee\SimpleRouter\Exceptions\NotFoundHttpException) {
             http_response_code(404);
             if ($this->debug) {
-                (new Sessao())->criar('erro_debug', [
+                (new Sessao())->criar('erroDebug', [
                     'mensagem' => $excecao->getMessage(),
                     'arquivo'  => $excecao->getFile(),
                     'linha'    => $excecao->getLine(),
