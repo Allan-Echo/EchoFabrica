@@ -37,10 +37,10 @@ class Rotas
         SimpleRouter::get(Configuracao::BASE_ROUTE . 'erro/debug', 'ExceptionControlador@erroDebug');
 
         // Handler de erros do SimpleRouter
-        SimpleRouter::error(function ($request, \Exception $error) {
+        /* SimpleRouter::error(function ($request, \Exception $error) {
             // Basta lançar a exceção: o TratadorExcecao já está registrado globalmente
             throw $error;
-        });
+        }); */
 
         SimpleRouter::start();
     }
