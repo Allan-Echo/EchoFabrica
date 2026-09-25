@@ -31,3 +31,5 @@ server.js
 guia_git_interativo.html
 Documentos
 git_loop.ps1
+phpcs.xml
+.php-cs-fixer.php
