@@ -14,7 +14,7 @@ class Helpers
 
         $local = ($url ? self::url($url) : self::url());
 
-        header("Location: {$local} ");
+        header("Location: {$local}");
         exit();
     }
 
