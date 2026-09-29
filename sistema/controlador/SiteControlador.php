@@ -64,8 +64,46 @@ class SiteControlador extends AdminControlador
         echo $this->template->rendenrizar(
             'cadastrolayout.html',
             [
-                'maquinas' => (new Maquina())->buscarMaq(),
+                'maquinas' => (new Maquina())->buscar()->ordenar('model ASC')->resultado(),
                 'layouts' => (new Layout())->filtrarLayout($id)
+            ]
+        );
+    }
+
+    public function criarLayout() //falta criar e colocar as veirifcações de Layout e LayoutMaquina
+    {
+        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?? $_POST; // depois de depurar tirar o $_POST
+        $dadosLayout = array_filter($dados, fn ($chave) => $chave === 'nome' || $chave === 'descricao', ARRAY_FILTER_USE_KEY);
+        $maquinasId = array_diff_key($dados, $dadosLayout);
+
+        if (!empty($dados)) {
+            try {
+                $layout = new Layout();
+                $layoutMaquina = new LayoutMaquina();
+
+                $layout->denomination = $dados['nome'];
+                $layout->observation = $dados['descricao'];
+                $layout->salvar();
+                $layoutId = $layout->id;
+
+                $layoutMaquina->fk_layout_id = $layoutId;
+                $layoutMaquina->maquinas = $maquinasId;
+                $layoutMaquina->montarLayout();
+
+                $this->mensagem->sucesso('Layout Cadastrado com Sucesso')->flash();
+                Helpers::redirecionar('layouts');
+                exit();
+
+            } catch (\Throwable $th) {
+                throw $th;
+            }
+        }
+
+        echo $this->template->rendenrizar(
+            'cadastrolayout.html',
+            [
+                'maquinas' => (new Maquina())->buscar()->ordenar('model ASC')->resultado(),
+                'layouts' => (new Layout())->filtrarLayout($id) // não faz mais sentido, é necessário novo form de cadastro
             ]
         );
     }
