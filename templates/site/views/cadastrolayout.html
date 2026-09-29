@@ -18,7 +18,7 @@
         <!--O col-2 determina a largura disponível igualmente para cada botão, o d-flex serve para usar o display flex e aplicar a propriedade flex-fill onde faz com que determinado elemento ocupe todo o espaço que tem disponivel, ou seja, o col-2. Por último, a propriedade btn-lg no label deixa o nome do botão proporcional e responsivo ao preenchimento do flex-fill-->
             {% for maquina in maquinas %}
         <div class="col-2 d-flex mb-2">
-            <input type="checkbox" class="btn-check" id="{{maquina.model}}" autocomplete="off" name="{{maquina.model}}" value="{{maquina.id_machine}}">
+            <input type="checkbox" class="btn-check" id="{{maquina.model}}" autocomplete="off" name="fk_id_machine" value="{{maquina.id_machine}}">
             <label for="{{maquina.model}}" class="flex-fill rounded-4 btn btn-lg btn-outline-primary me-2">{{maquina.model}}</label>
         </div>
         {% endfor %}
