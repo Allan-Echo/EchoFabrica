@@ -295,6 +295,21 @@ abstract class Modelo
     }
 
     /**
+     * Converte dados dinâmicos em array associativo e sanitizado.
+     *
+     * Funciona como adaptador entre o objeto $this->dados (criado via __set)
+     * e os métodos cadastrar() e atualizar() que requerem arrays.
+     *
+     * @return array Array associativo com dados sanitizados
+     * @see __set() Cria os dados dinâmicos
+     * @see salvar() Chama este método para preparar dados
+     */
+    protected function dadosComoArray(): array
+    {
+        return $dados = (array) $this->dados;
+    }
+
+    /**
      * Verifica se uma propriedade dinâmica existe no objeto de dados.
      *
      * @param string $campo Nome da propriedade
@@ -317,20 +332,6 @@ abstract class Modelo
     }
 
 
-    /**
-     * Converte dados dinâmicos em array associativo e sanitizado.
-     *
-     * Funciona como adaptador entre o objeto $this->dados (criado via __set)
-     * e os métodos cadastrar() e atualizar() que requerem arrays.
-     *
-     * @return array Array associativo com dados sanitizados
-     * @see __set() Cria os dados dinâmicos
-     * @see salvar() Chama este método para preparar dados
-     */
-    protected function dadosComoArray(): array
-    {
-        return $dados = (array) $this->dados;
-    }
 
     /**
      * Orquestra a persistência dos dados no banco de dados.
