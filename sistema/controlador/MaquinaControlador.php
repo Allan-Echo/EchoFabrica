@@ -22,7 +22,7 @@ class MaquinaControlador extends AdminControlador
     {
 
         // Recebe dados enviados via POST do formulário de cadastro
-        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?? $_POST;
+        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?? $_POST; // depois de depurar tirar o $_POST
 
         // Só processa se houver dados enviados via POST
         if (!empty($dados)) {
