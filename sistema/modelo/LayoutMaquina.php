@@ -13,22 +13,45 @@ class LayoutMaquina extends Modelo
         parent::__construct('layout_machine');
     }
 
-    public function montarLayout(string $id, array $dados)
+    /*   public function montarLayout(string $id, array $dados)
+      {
+          unset($dados['layout']); // fazer formulario parar de enviar, colocar condicional
+          $querys = [];
+          //$i= 1;
+          foreach ($dados as $chave => $valor) {
+              $query = "INSERT INTO {$this->tabela} (fk_id_layout, fk_id_machine) VALUES ";
+              $querys[] = $query .= "($id, $valor)";
+              //$i++;
+          }
+
+
+          //return $querys;
+          // $dados = [
+          //   'query1' => "INSERT INTO `layout_machine` (fk_id_layout, fk_id_machine) VALUES ('1','2')",
+          //   'query2' => "INSERT INTO `layout_machine` (fk_id_layout, fk_id_machine) VALUES ('1','3')"
+          // ];
+          $this->conection->insertMult($querys);
+      } */
+
+    public function montarLayout()
     {
-        unset($dados['layout']); // fazer formulario parar de enviar, colocar condicional
-        $querys = [];
-        //$i= 1;
-        foreach ($dados as $chave => $valor) {
-            $query = "INSERT INTO {$this->tabela} (fk_id_layout, fk_id_machine) VALUES ";
-            $querys[] = $query .= "($id, $valor)";
-            //$i++;
-        }
-        //return $querys;
-        // $dados = [
-        //   'query1' => "INSERT INTO `layout_machine` (fk_id_layout, fk_id_machine) VALUES ('1','2')",
-        //   'query2' => "INSERT INTO `layout_machine` (fk_id_layout, fk_id_machine) VALUES ('1','3')"
-        // ];
+        $querys = $this->montarQuerys();
+
         $this->conection->insertMult($querys);
+    }
+
+    private function montarQuerys(): array
+    {
+        $colunas = 'fk_id_layout, fk_id_machine';
+        $layoutId = $this->fk_id_layout;
+        $maquinasId = $this->maquinas;
+        $querys = [];
+
+        foreach ($maquinasId as $fk_id_machine) {
+            $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ($layoutId, $fk_id_machine)";
+            $querys[] = $query;
+        }
+        return $querys;
     }
 
     public function buscarLayoutMachine(string $layout): array
