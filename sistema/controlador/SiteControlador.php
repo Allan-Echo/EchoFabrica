@@ -109,8 +109,8 @@ class SiteControlador extends AdminControlador
         echo $this->template->rendenrizar(
             'cadastrolayout.html',
             [
-                'maquinas' => (new Maquina())->buscar()->ordenar('model ASC')->resultado(),
-                'layouts' => (new Layout())->filtrarLayout($id) // não faz mais sentido, é necessário novo form de cadastro
+                'maquinas' => (new Maquina())->buscar()->ordenar('model ASC')->resultado()/* ,
+                'layouts' => (new Layout())->filtrarLayout($id) // não faz mais sentido, é necessário novo form de cadastro */
             ]
         );
     }
