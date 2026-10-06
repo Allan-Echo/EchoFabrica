@@ -79,25 +79,30 @@ class SiteControlador extends AdminControlador
         $maquinasId = array_diff_key($dados, $dadosLayout);
 
         if (!empty($dados)) {
-            try {
-                $layout = new Layout();
-                $layoutMaquina = new LayoutMaquina();
+            $validacaoLayout = new LayoutValidacao($dadosLayout);
+            $validacaoMaquina = new LayoutMaquinaValidacao($maquinasId);
+            if ($validacaoLayout->falhou()) {
+                $this->mensagem->erro($validacaoLayout->primeiroErro())->flash();
+            } elseif ($validacaoMaquina->falhou()) {
+                $this->mensagem->erro($validacaoMaquina->primeiroErro())->flash();
+            } else {
+                try {
+                    $layout = new Layout();
+                    $layoutMaquina = new LayoutMaquina();
+                    $dadosValidados = $validacaoLayout->dados();
+                    $maquinasIdValidadas = $validacaoMaquina->dados();
 
-                $layout->denomination = $dados['nome'];
-                $layout->observation = $dados['descricao'];
-                $layout->salvar();
-                $layoutId = $layout->id;
+                    $layout->denomination = $dadosValidados['nome'];
+                    $layout->observation = $dadosValidados['descricao'];
 
-                $layoutMaquina->fk_layout_id = $layoutId;
-                $layoutMaquina->maquinas = $maquinasId;
-                $layoutMaquina->montarLayout();
+                    $layoutMaquina->montarLayout($layout, $maquinasIdValidadas);
 
-                $this->mensagem->sucesso('Layout Cadastrado com Sucesso')->flash();
-                Helpers::redirecionar('layouts');
-                exit();
-
-            } catch (\Throwable $th) {
-                throw $th;
+                    $this->mensagem->sucesso('Layout Cadastrado com Sucesso')->flash();
+                    Helpers::redirecionar('layouts');
+                    exit();
+                } catch (\Throwable $th) {
+                    throw $th;
+                }
             }
         }
 
