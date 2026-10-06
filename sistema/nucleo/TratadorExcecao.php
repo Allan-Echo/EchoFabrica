@@ -2,8 +2,6 @@
 
 namespace sistema\nucleo;
 
-use sistema\nucleo\Helpers;
-
 class TratadorExcecao
 {
     private function __construct(
