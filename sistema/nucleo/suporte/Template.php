@@ -2,8 +2,8 @@
 
 namespace sistema\nucleo\suporte;
 
-use sistema\nucleo\Helpers;
 use sistema\nucleo\Configuracao;
+use sistema\nucleo\Helpers;
 
 class Template
 {
