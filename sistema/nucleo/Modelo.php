@@ -172,42 +172,71 @@ abstract class Modelo
     }
 
     /**
-     * Insere um novo registro na tabela do banco de dados.
+     * Orquestra a persistência dos dados no banco de dados.
      *
-     * Método protegido que prepara e executa a inserção. Realiza a limpeza de erros prévios,
-     * durante a execução da query INSERT.
-     * @param array $dados Dados associativos (coluna => valor) para inserção.
-     * @return bool Retorna true em caso de sucesso ou false em caso de falha.
-     * @see Erro::limparErro() Reseta o estado de erro antes da operação.
+     * Decide automaticamente entre uma operação de INSERT (novo registro)
+     * ou UPDATE (registro existente) com base na existência da propriedade 'id'.
+     *
+     * @return bool True se a operação foi bem-sucedida, false caso contrário.
+     * @see __set() Cria os dados dinâmicos
+     * @see executarCadastro() Chamado se não houver ID.
+     * @see executarAtualizacao() Chamado se houver ID.
+     * @see erro() Caso retorne false, verifique o erro aqui.
+     *  @throws \Throwable
      */
-    protected function cadastrar(array $dados): bool
+    public function salvar(): bool
     {
+        return empty($this->id) ? $this->executarCadastro() : $this->executarAtualizacao();
+    }
 
-        try {
-            $this->erro->limparErro();
+    /**
+     * Orquestra a persistência de um novo registro no banco de dados.
+     *
+     * Chamado internamente pelo método salvar(). Além de cadastrar,
+     * recupera o último ID inserido e o atribui ao objeto.
+     *
+     * @return bool True em caso de sucesso, false se houver falha (com mensagem flash).
+     * @see salvar()
+     * @see cadastrar()
+     */
+    private function executarCadastro(): bool
+    {
+        return $this->cadastrar($this->dadosComoArray());
+    }
 
-            $colunas = implode(', ', array_keys($dados));
-            $valores = ':' . implode(', :', array_keys($dados));
-            $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
 
-            $this->id = $this->conection->insertComUltimoId($query, $dados);
+    /**
+     * Orquestra a atualização de um registro existente no banco de dados.
+     *
+     * Chamado internamente pelo método salvar(). Após a atualização,
+     * sincroniza o objeto atual com os dados recém-salvos no banco de dados.
+     *
+     * @return bool True em caso de sucesso, false se houver falha (com mensagem flash).
+     * @see salvar()
+     * @see atualizar()
+     * @see buscarPorId()
+     */
+    private function executarAtualizacao(): bool
+    {
+        $this->atualizar($this->dadosComoArray(), 'id = :id', ['id' => $this->id]);
 
-            return true;
-        } catch (\Throwable $e) {
-            $this->erro->definirMensagem('Falha ao inserir no banco.');
-            throw $e;
+        $atualizado = $this->buscarPorId($this->id);
+        if ($atualizado) {
+            $this->dados = $atualizado->dados();
         }
+
+        return true;
     }
 
 
     /**
      * Atualiza registros na tabela do banco de dados.
-     *
-     * @param array $dados Dados associativos para atualização (coluna => valor).
-     * @param string $where Condição para atualização (ex: "id = :id").
-     * @param array $parametros Valores dos parâmetros da condição WHERE.
-     * @return bool True em caso de sucesso, false em caso de falha.
-     */
+    *
+    * @param array $dados Dados associativos para atualização (coluna => valor).
+    * @param string $where Condição para atualização (ex: "id = :id").
+    * @param array $parametros Valores dos parâmetros da condição WHERE.
+    * @return bool True em caso de sucesso, false em caso de falha.
+    */
     protected function atualizar(array $dados, string $where, array $parametros): bool
     {
         try {
@@ -337,84 +366,48 @@ abstract class Modelo
         return $this->dados->$campo ?? null;
     }
 
-
-
-    /**
-     * Orquestra a persistência dos dados no banco de dados.
-     *
-     * Decide automaticamente entre uma operação de INSERT (novo registro)
-     * ou UPDATE (registro existente) com base na existência da propriedade 'id'.
-     *
-     * @return bool True se a operação foi bem-sucedida, false caso contrário.
-     * @see __set() Cria os dados dinâmicos
-     * @see executarCadastro() Chamado se não houver ID.
-     * @see executarAtualizacao() Chamado se houver ID.
-     * @see erro() Caso retorne false, verifique o erro aqui.
-     *  @throws \Throwable
-     */
-    public function salvar(): bool
-    {
-        return empty($this->id) ? $this->executarCadastro() : $this->executarAtualizacao();
-    }
-
+    // ========================================================================
+    // Métodos para avaliar se exiti utilidade
+    // ========================================================================
 
     /**
-     * Orquestra a persistência de um novo registro no banco de dados.
+     * Retorna a mensagem de erro da última operação.
      *
-     * Chamado internamente pelo método salvar(). Além de cadastrar,
-     * recupera o último ID inserido e o atribui ao objeto.
+     * Getter para a propriedade protegida $erro.
+     * Chame após salvar(), cadastrar() ou atualizar()
+     * para verificar se houve problema.
      *
-     * @return bool True em caso de sucesso, false se houver falha (com mensagem flash).
-     * @see salvar()
-     * @see cadastrar()
+     * @return mixed Mensagem de erro ou null
+     *
+     * @see mensagem() Retorna objeto Mensagem para mais controle
      */
-    private function executarCadastro(): bool
+    public function erro(): string
     {
-        return $this->cadastrar($this->dadosComoArray());
+        return $this->erro->mensagem;
     }
 
     /**
-     * Orquestra a atualização de um registro existente no banco de dados.
+     * Retorna o objeto Mensagem para feedback ao usuário.
      *
-     * Chamado internamente pelo método salvar(). Após a atualização,
-     * sincroniza o objeto atual com os dados recém-salvos no banco de dados.
+     * Permite criar, armazenar e exibir mensagens de sucesso, erro ou aviso.
+     * O objeto Mensagem gerencia como as mensagens são apresentadas.
      *
-     * @return bool True em caso de sucesso, false se houver falha (com mensagem flash).
-     * @see salvar()
-     * @see atualizar()
-     * @see buscarPorId()
+     * @return Mensagem Instância do objeto Mensagem
+     *
+     * @see erro() Retorna apenas a mensagem de erro anterior
      */
-    private function executarAtualizacao(): bool
+    public function mensagemDeErro(string $mensagem): Mensagem
     {
-        $this->atualizar($this->dadosComoArray(), 'id = :id', ['id' => $this->id]);
-
-        $atualizado = $this->buscarPorId($this->id);
-        if ($atualizado) {
-            $this->dados = $atualizado->dados();
-        }
-
-        return true;
+        return $this->mensagem->erro($mensagem);
     }
 
-
-
     /**
-     * Busca um registro específico pela chave primária.
+     * Retorna os dados do objeto.
      *
-     * Método de conveniência para consultas rápidas por ID.
-     * Mais direto que usar buscar() para um registro específico.
-     * Retorna null se nenhum registro for encontrado.
-     *
-     * @param int $id Valor do ID (chave primária)
-     *
-     * @return object|null Objeto da classe filha com dados, ou null se não existe
-     *
-     * @see buscar() Alternativa mais flexível para consultas customizadas
+     * @return mixed Os dados armazenados no objeto, geralmente um stdClass ou array de resultados.
      */
-    public function buscarPorId(int $id): ?object
+    protected function dados(): mixed
     {
-        $this->buscar('id = :id', "id={$id}");
-        $resultado = $this->resultado();
-        return !empty($resultado) ? $resultado[0] : null;
+        return $this->dados;
     }
 }
