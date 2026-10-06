@@ -27,6 +27,11 @@ abstract class Modelo
     protected string $tabela;
 
     /**
+     * @var string Nome das colunas para modelos que não recebem o nome das colunas dinamicamente
+     */
+    protected ?string $colunas;
+
+    /**
      * @var mixed Armazena os dados do registro (geralmente um stdClass).
      */
     protected mixed $dados;
@@ -65,12 +70,13 @@ abstract class Modelo
      *
      * @param string $tabela Nome da tabela no banco de dados
      */
-    public function __construct(string $tabela)
+    public function __construct(string $tabela, ?string $colunas = null)
     {
         $this->conection = new EasyPDO();
         $this->mensagem = new Mensagem();
         $this->erro = new Erro();
         $this->tabela = $tabela;
+        $this->colunas = $colunas;
     }
 
     /**

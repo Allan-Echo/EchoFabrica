@@ -16,7 +16,8 @@
 namespace sistema\nucleo\suporte;
 
 use PDO;
-use PDOException;
+use RuntimeException;
+use sistema\nucleo\Modelo;
 
 class EasyPDO
 {
@@ -487,6 +488,39 @@ class EasyPDO
             return $lastId;
         } catch (\PDOException $e) {
             $this->affectedRows = 0;
+            throw $e;
+        }
+    }
+
+    public function insertComDependencia(array|string $transacoes, array $dadosTransacoes, Modelo $dependencia): int
+    {
+        $this->connection->beginTransaction();
+
+        try {
+            foreach ((array) $transacoes as $query) {
+                $stmt = $this->connection->prepare($query);
+                $stmt->execute($dadosTransacoes);
+            }
+            $primaryId = $this->connection->lastInsertId();
+            if ($primaryId === false || $primaryId === '') {
+                throw new RuntimeException('Nenhum ID foi gerado.');
+            }
+            $stmt = $this->connection->prepare($dependencia->queryBase);
+            // parece desnecessário a var intermediaria, mas evita chamar __$get no loop, facilitando debug e leve ganho de performance
+            $colunaPrimaria = $dependencia->colunaPrimaria;
+            $colunaDependente = $dependencia->colunaDependente;
+            foreach ($dependencia->valoresDependentes as $valorId) {
+                $stmt->execute([
+                    $colunaPrimaria => $primaryId,
+                    $colunaDependente => $valorId]);
+            }
+            $this->connection->commit();
+            $this->connection = null;
+            return $primaryId;
+        } catch (\Throwable $e) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
             throw $e;
         }
     }

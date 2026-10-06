@@ -45,16 +45,16 @@ abstract class Validacao
     {
         $this->erro->limparErro();
 
-        foreach ($this->regras as $campo => $regrasString) {
+        foreach ($this->regras as $campo => $regrasDoCampo) {
             if (isset($this->erro->mensagem)) {
                 break;
             }
             $valor = $this->dadosBrutos[$campo] ?? null;
-            $listaRegras = explode('|', $regrasString);
+            $listarRegras = explode('|', $regrasDoCampo);
 
-            foreach ($listaRegras as $regraCompleta) {
+            foreach ($listarRegras as $regra) {
                 // Separa o nome da regra de seus parâmetros (ex: min:1 -> $regra='min', $parametro='1')
-                $partes = explode(':', $regraCompleta, 2);
+                $partes = explode(':', $regra, 2);
                 $regra = $partes[0];
                 $parametro = $partes[1] ?? null;
 

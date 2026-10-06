@@ -7,6 +7,8 @@ use sistema\modelo\LayoutMaquina;
 use sistema\modelo\Maquina;
 use sistema\modelo\Producao;
 use sistema\nucleo\Helpers;
+use sistema\validacao\LayoutMaquinaValidacao;
+use sistema\validacao\LayoutValidacao;
 
 class SiteControlador extends AdminControlador
 {
