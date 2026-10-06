@@ -31,7 +31,6 @@ class MaquinaControlador extends AdminControlador
             if ($validacao->falhou()) {
                 $this->mensagem->erro($validacao->primeiroErro())->flash();
             } else {
-
                 //try {
                 $maquina = new Maquina();
 
