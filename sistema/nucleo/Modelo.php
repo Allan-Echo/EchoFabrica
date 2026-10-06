@@ -261,56 +261,73 @@ abstract class Modelo
     }
 
     /**
-     * Retorna a mensagem de erro da última operação.
+     * Insere um novo registro na tabela do banco de dados.
      *
-     * Getter para a propriedade protegida $erro.
-     * Chame após salvar(), cadastrar() ou atualizar()
-     * para verificar se houve problema.
-     *
-     * @return mixed Mensagem de erro ou null
-     *
-     * @see mensagem() Retorna objeto Mensagem para mais controle
-     */
-    public function erro(): string
+     * Método protegido que prepara e executa a inserção. Realiza a limpeza de erros prévios,
+     * durante a execução da query INSERT.
+     * @param array $dados Dados associativos (coluna => valor) para inserção.
+     * @return bool Retorna true em caso de sucesso ou false em caso de falha.
+     * @see Erro::limparErro() Reseta o estado de erro antes da operação.
+    */
+    protected function cadastrar(array $dados): bool
     {
-        return $this->erro->mensagem;
+
+        try {
+            $this->erro->limparErro();
+
+            $query = $this->prepararCadastro($dados)->query;
+
+            $this->id = $this->conection->insertComUltimoId($query, $dados);
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->erro->definirMensagem('Falha ao inserir no banco.');
+            throw $e;
+        }
+    }
+
+    protected function prepararCadastro(?array $dados = null): static
+    {
+        if ($dados === null) {
+            $dados = $this->dadosComoArray();
+        }
+
+        $colunas = implode(', ', array_keys($dados));
+        $valores = ':' . implode(', :', array_keys($dados));
+        $this->query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
+        return $this;
     }
 
     /**
-     * Retorna o objeto Mensagem para feedback ao usuário.
+     * Busca um registro específico pela chave primária.
      *
-     * Permite criar, armazenar e exibir mensagens de sucesso, erro ou aviso.
-     * O objeto Mensagem gerencia como as mensagens são apresentadas.
+     * Método de conveniência para consultas rápidas por ID.
+     * Mais direto que usar buscar() para um registro específico.
+     * Retorna null se nenhum registro for encontrado.
      *
-     * @return Mensagem Instância do objeto Mensagem
+     * @param int $id Valor do ID (chave primária)
      *
-     * @see erro() Retorna apenas a mensagem de erro anterior
+     * @return object|null Objeto da classe filha com dados, ou null se não existe
+    *
+    * @see buscar() Alternativa mais flexível para consultas customizadas
      */
-    public function mensagemDeErro(string $mensagem): Mensagem
+    public function buscarPorId(int $id): ?object
     {
-        return $this->mensagem->erro($mensagem);
-    }
-
-    /**
-     * Retorna os dados do objeto.
-     *
-     * @return mixed Os dados armazenados no objeto, geralmente um stdClass ou array de resultados.
-     */
-    public function dados(): mixed
-    {
-        return $this->dados;
+        $this->buscar('id = :id', "id={$id}");
+        $resultado = $this->resultado();
+        return !empty($resultado) ? $resultado[0] : null;
     }
 
     /**
      * Magic method que captura atribuições de propriedades dinâmicas.
-     *
-     * Quando você atribui valor a uma propriedade não declarada explicitamente,
-     * este método é chamado automaticamente. Armazena o atributo em um stdClass
-     * dentro de $this->dados para posterior persistência.
-     *
-     * Exemplo:
-     * ```php
-     * $usuario->nome = 'Marcos';
+    *
+    * Quando você atribui valor a uma propriedade não declarada explicitamente,
+    * este método é chamado automaticamente. Armazena o atributo em um stdClass
+    * dentro de $this->dados para posterior persistência.
+    *
+    * Exemplo:
+    * ```php
+    * $usuario->nome = 'Marcos';
      * ```
      *
      * @param string $name Nome da propriedade
