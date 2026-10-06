@@ -160,6 +160,31 @@ abstract class Validacao
         return filter_var($valor, FILTER_VALIDATE_EMAIL) !== false;
     }
 
+    protected function validarArray(string $campo, mixed &$array, ?string $parametro): bool
+    {
+        if (is_null($array) || $array === '') {
+            return true;
+        }
+
+        $validacao = match ($parametro) {
+            'Inteiro' => fn ($valor) => filter_var($valor, FILTER_VALIDATE_INT),
+            'String'  => fn ($valor) => is_string($valor),
+            default   => fn ($valor) => is_array($valor),
+        };
+
+        $arrayFiltrado[$campo] = [];
+        foreach ($array as $valor) {
+            $valorFiltrado = $validacao($valor);
+            if ($valorFiltrado === false) {
+                return false;
+            } else {
+                $arrayFiltrado[$campo][] = $valorFiltrado;
+            }
+        }
+        $array = $arrayFiltrado[$campo];
+        return true;
+    }
+
     protected function validarMin(string $campo, mixed $valor, ?string $parametro): bool
     {
         if (is_null($valor) || $valor === '' || is_null($parametro)) {
