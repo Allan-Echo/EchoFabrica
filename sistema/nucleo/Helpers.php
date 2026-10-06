@@ -2,8 +2,6 @@
 
 namespace sistema\nucleo;
 
-use sistema\nucleo\Configuracao;
-
 //use Exception;
 
 class Helpers
