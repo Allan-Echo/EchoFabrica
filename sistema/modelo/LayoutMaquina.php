@@ -31,25 +31,33 @@ class LayoutMaquina extends Modelo
           $this->conection->insertMult($querys);
       } */
 
-    public function montarLayout()
+    public function montarLayout(Layout $layout, array $maquinas)
     {
-        $querys = $this->montarQuerys();
+        $cadastroLayout = $layout->prepararCadastro()->query;
+        $moldeLayoutMaquina = $this->montarMolde($maquinas);
+        /* $this->fk_layout_id = null; // so pra me lembrar que o retorno do insert precisa atribuir
+           $this->fk_machine_id = null;
+           $layout->id = null */
 
-        $this->conection->insertMult($querys);
+        $this->conection->insertComDependencia($cadastroLayout, $layout->dadosComoArray(), $moldeLayoutMaquina);
     }
 
-    private function montarQuerys(): array
+    private function montarMolde(array $maquinas): LayoutMaquina // segunda transação
     {
-        $colunas = 'fk_id_layout, fk_id_machine';
-        $layoutId = $this->fk_id_layout;
-        $maquinasId = $this->maquinas;
-        $querys = [];
+        $placeholdersNomeados = ':' . str_replace(', ', ', :', $this->colunas);
+        $this->queryBase =
+        "INSERT INTO {$this->tabela} ({$this->colunas}) VALUES ({$placeholdersNomeados})";
 
-        foreach ($maquinasId as $fk_id_machine) {
-            $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ($layoutId, $fk_id_machine)";
+        $this->colunaDependente = implode(array_keys($maquinas));
+        $this->valoresDependentes = current($maquinas);
+        $this->colunaPrimaria = 'fk_id_layout';
+
+        /* foreach ($fk_id_machine as $maquinaId) {
+            $query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ($layoutId, $maquinaId)";
             $querys[] = $query;
-        }
-        return $querys;
+        } */
+
+        return $this;
     }
 
     public function buscarLayoutMachine(string $layout): array
