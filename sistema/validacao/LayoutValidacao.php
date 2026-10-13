@@ -16,7 +16,8 @@ class LayoutValidacao extends Validacao
     protected array $regras = [
         'nome'       => 'requirido|texto|max:15',
         'descricao'  => 'requirido|texto|max:255',
-        'observacao' => 'texto|max:255'
+        'observacao' => 'texto|max:255',
+        'id'         => 'inteiro|min:1'
     ];
 
     // Opcional: Sobrescreve mensagens se quiser padronizar com as mensagens que você já exibia no sistema
