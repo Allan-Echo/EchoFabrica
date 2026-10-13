@@ -2,29 +2,25 @@
 
 namespace sistema\controlador;
 
-use sistema\modelo\Layout;
 use sistema\modelo\LayoutMaquina;
 use sistema\modelo\Maquina;
 use sistema\modelo\Producao;
-use sistema\nucleo\Helpers;
-use sistema\validacao\LayoutMaquinaValidacao;
-use sistema\validacao\LayoutValidacao;
 
 class SiteControlador extends AdminControlador
 {
     public function erro404(): void
     {
-        echo $this->template->rendenrizar('404.html', []);
+        echo $this->template->renderizar('404.html', []);
     }
 
     public function index(): void
     {
-        echo $this->template->rendenrizar('index.html', []);
+        echo $this->template->renderizar('index.html', []);
     }
 
     public function sobre(): void
     {
-        echo $this->template->rendenrizar(
+        echo $this->template->renderizar(
             'sobre.html',
             [
                 'dados' => (new Maquina())->buscarMaq()
@@ -39,7 +35,7 @@ class SiteControlador extends AdminControlador
     //      if(!$modelo) {
     //          Helpers::redirecionar('404');
     //      }
-    //     echo $this->template->rendenrizar('post.html',
+    //     echo $this->template->renderizar('post.html',
     //     [
     //         'modelo' => (new MaquinaModelo())->filtrar($dado)
     //     ]);
@@ -48,7 +44,7 @@ class SiteControlador extends AdminControlador
     // public function dashboard(string $layout): void
     // {
     //      var_dump((new MaquinaModelo)->buscarProducao($layout));
-    //     echo $this->template->rendenrizar('dashboard.html',
+    //     echo $this->template->renderizar('dashboard.html',
     //     [
     //         'producao' => (new MaquinaModelo)->buscarProducao($layout)
     //     ]);
@@ -63,54 +59,11 @@ class SiteControlador extends AdminControlador
             (new LayoutMaquina())->montarLayout($id, $dados);
         }
 
-        echo $this->template->rendenrizar(
+        echo $this->template->renderizar(
             'cadastrolayout.html',
             [
-                'maquinas' => (new Maquina())->buscar()->ordenar('model ASC')->resultado(),
-                'layouts' => (new Layout())->filtrarLayout($id)
-            ]
-        );
-    }
-
-    public function criarLayout() //falta criar e colocar as veirifcações de Layout e LayoutMaquina
-    {
-        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW) ?? $_POST; // depois de depurar tirar o $_POST
-        $dadosLayout = array_filter($dados, fn ($chave) => $chave === 'nome' || $chave === 'descricao', ARRAY_FILTER_USE_KEY);
-        $maquinasId = array_diff_key($dados, $dadosLayout);
-
-        if (!empty($dados)) {
-            $validacaoLayout = new LayoutValidacao($dadosLayout);
-            $validacaoMaquina = new LayoutMaquinaValidacao($maquinasId);
-            if ($validacaoLayout->falhou()) {
-                $this->mensagem->erro($validacaoLayout->primeiroErro())->flash();
-            } elseif ($validacaoMaquina->falhou()) {
-                $this->mensagem->erro($validacaoMaquina->primeiroErro())->flash();
-            } else {
-                try {
-                    $layout = new Layout();
-                    $layoutMaquina = new LayoutMaquina();
-                    $dadosValidados = $validacaoLayout->dados();
-                    $maquinasIdValidadas = $validacaoMaquina->dados();
-
-                    $layout->denomination = $dadosValidados['nome'];
-                    $layout->observation = $dadosValidados['descricao'];
-
-                    $layoutMaquina->montarLayout($layout, $maquinasIdValidadas);
-
-                    $this->mensagem->sucesso('Layout Cadastrado com Sucesso')->flash();
-                    Helpers::redirecionar('layouts');
-                    exit();
-                } catch (\Throwable $th) {
-                    throw $th;
-                }
-            }
-        }
-
-        echo $this->template->rendenrizar(
-            'cadastrolayout.html',
-            [
-                'maquinas' => (new Maquina())->buscar()->ordenar('model ASC')->resultado()/* ,
-                'layouts' => (new Layout())->filtrarLayout($id) // não faz mais sentido, é necessário novo form de cadastro */
+                'maquinas' => (new Maquina())->buscar()->ordenar('model ASC')->resultado('associativo'),
+                // 'layouts' => (new Layout())->filtrarLayout($id)
             ]
         );
     }
@@ -122,7 +75,7 @@ class SiteControlador extends AdminControlador
             (new Producao())->guardarProducao($layout, $dados);
         }
 
-        echo $this->template->rendenrizar(
+        echo $this->template->renderizar(
             'producao.html',
             [
                 'maquinas' => (new LayoutMaquina())->buscarLayoutMachine($layout),
@@ -131,23 +84,8 @@ class SiteControlador extends AdminControlador
         );
     }
 
-    public function layouts(): void
-    {
-        $dados = filter_input_array(INPUT_POST, FILTER_UNSAFE_RAW);
-        if (!empty($dados)) {
-            (new Layout())->cadastrarLayout($dados);
-        }
-
-        echo $this->template->rendenrizar(
-            'layouts.html',
-            [
-                'layouts' => (new Layout())->buscarLayout()
-            ]
-        );
-    }
-
     //Analisar como seria para deletar, pois o layout está vinculado em outras tabelas
-    public function deletar($id): void
+    /* public function deletar($id): void
     {
         //$id = filter_input(INPUT_POST, FILTER_UNSAFE_RAW);
 
@@ -156,5 +94,5 @@ class SiteControlador extends AdminControlador
         }
 
         Helpers::redirecionar('layouts');
-    }
+    } */
 }
