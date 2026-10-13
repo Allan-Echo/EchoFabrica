@@ -19,7 +19,8 @@ class MaquinaValidacao extends Validacao
         'funcao'    => 'requirido|texto|max:255',
         'operacoes' => 'requirido|inteiro|min:1',
         'qtd'       => 'requirido|inteiro|min:1',
-        'valor'     => 'float|min:0'
+        'valor'     => 'float|min:0',
+        'id'        => 'inteiro|min:1'
     ];
 
     // Opcional: Sobrescreve mensagens se quiser padronizar com as mensagens que você já exibia no sistema
