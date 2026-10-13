@@ -19,7 +19,7 @@ class Template
         $this->globals();
     }
 
-    public function rendenrizar(string $view, array $dados)
+    public function renderizar(string $view, array $dados)
     {
         return $this->twig->render($view, $dados);
     }
