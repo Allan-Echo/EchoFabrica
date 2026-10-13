@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block card %}
+<main class="card border-0 shadow-sm container my-3 flex-grow-1">
+  <div class="card-header bg-white border-0">
+    <h5 class="card-title">Layouts disponíveis</h5>
+  </div>
+  <div class="card-body">
+
+{% block main %}
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Layout</th>
+        <th scope="col">Observação</th>
+        <th scope="col">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {%for layout in layouts %}
+      <tr>
+        <th class="fs-5 text-uppercase fw-bold" scope="row">{{layout.denomination}}</th>
+        <td>{{layout.observation}}</td>
+        <td>
+          <div class="btn-group d-flex" role="group">
+            <a href="{{URL_DEV}}produção/{{layout.id_layout}}" class="btn btn-sm btn-primary rounded-4 col-1 mx-1">Produzir</a>
+            <a href="{{URL_DEV}}layouts/montar/{{layout.id_layout}}" class="btn btn-sm btn-success rounded-4 col-1 mx-1">Máquinas</a>
+            <a href="{{URL_DEV}}layouts/deletar/{{layout.id_layout}}" class="btn btn-sm btn-danger rounded-4 col-1 mx-1">Excluir</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div class="mt-2"><button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#newDenomination">Criar Layout</button></div>
+  
+  <div class="modal fade" id="newDenomination" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalLabel">Novo layout</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post">
+        <div class="modal-body">         
+            <div class="d-inline-flex align-items-start">
+              <label for="tituloLayout" class="fs-6 display-1 form-label col-5 ms-2 ps-2 align-self-center fw-semibold">Nome do Layout</label>
+              <input type="text" class="form-control" id="tituloLayout" name="nome">
+          </div>
+          <div class="d-inline-flex w-75 align-items-start mt-3 ms-3">
+            <label for="tituloLayout"
+              class="fs-6 display-1 form-label col-3 ms-2 ps-2 align-self-center fw-semibold me-3">Descrição</label>
+            <textarea class="form-control ms-4" rows="1" name="descricao"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          <input type="submit" value="Salvar" class="btn btn-primary">
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+{% endblock %}
+</div>
+</main>
+{% endblock %}
