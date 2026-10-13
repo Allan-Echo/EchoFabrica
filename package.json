@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "projeto",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "husky"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +13,10 @@
     "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.2",
     "parcel": "^2.12.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "husky": "^9.1.7"
   }
 }
