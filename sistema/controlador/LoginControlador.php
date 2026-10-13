@@ -34,7 +34,7 @@ class LoginControlador extends Controlador
                 }
             }
         }
-        echo $this->template->rendenrizar(
+        echo $this->template->renderizar(
             'login.html',
             [
 
