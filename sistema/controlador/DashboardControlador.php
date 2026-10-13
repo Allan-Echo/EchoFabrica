@@ -9,7 +9,7 @@ class DashboardControlador extends AdminControlador
 {
     public function dashboard(): void
     {
-        echo $this->template->rendenrizar(
+        echo $this->template->renderizar(
             'dashboard.html.twig',
             []
         );
