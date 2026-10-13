@@ -29,7 +29,7 @@ class Rotas
         // 4. Rotas para Layouts
         SimpleRouter::match(['get', 'post'], Configuracao::BASE_ROUTE . 'layouts/montar/{id}', 'SiteControlador@montarLayout');
         SimpleRouter::get(Configuracao::BASE_ROUTE . 'layouts/deletar/{id}', 'SiteControlador@deletar');
-        SimpleRouter::match(['get', 'post'], Configuracao::BASE_ROUTE . 'layouts', 'SiteControlador@layouts');
+        SimpleRouter::match(['get', 'post'], Configuracao::BASE_ROUTE . 'layouts', 'LayoutControlador@exibirLayouts');
 
         // 5. Rota de Erro
         SimpleRouter::get(Configuracao::BASE_ROUTE . '404', 'ExceptionControlador@erro404');
