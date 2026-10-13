@@ -34,7 +34,7 @@ abstract class Modelo
     /**
      * @var mixed Armazena os dados do registro (geralmente um stdClass).
      */
-    protected mixed $dados;
+    protected array|\stdClass $dados;
 
     /**
      * @var string|null Armazena a query SQL que está sendo construída.
@@ -93,24 +93,39 @@ abstract class Modelo
      * ```
      *
      * @param string|null $where Cláusula WHERE (ex: "id = :id").
-     * @param string|null $parametros Query string de parâmetros (ex: "id=1&status=ativo").
+     * @param string|array|null $parametros Query string de parâmetros (ex: "id=1&status=ativo") ou um array associativo (ex: ['id' => 1, 'status' => 'ativo']).
      * @param string $coluna Colunas a selecionar (padrão: "*").
      * @return static Retorna a própria instância para encadeamento.
      * @see ordenar() Para definir a ordem dos resultados.
      * @see limitar() Para definir paginação.
      * @see resultado() Para executar a query e obter os dados.
      */
-    public function buscar(?string $where = null, ?string $parametros = null, string $coluna = '*'): static
+    public function buscar(?string $where = null, string|array|null $parametros = null, bool $ativos = true, string $coluna = '*'): static
     {
         $this->query = "SELECT {$coluna} FROM " . $this->tabela;
 
-
+        $this->tiposDeRegistros($ativos);
 
         if (!empty($where)) {
-            $this->query .= " WHERE {$where}";
-            parse_str($parametros, $this->parametros);
+            $this->query .= " AND {$where}";
+
+            if (is_string($parametros)) {
+                parse_str($parametros, $this->parametros);
+            } elseif (is_array($parametros)) {
+                $this->parametros = $parametros;
+            }
         }
 
+        return $this;
+    }
+
+    private function tiposDeRegistros(bool $ativo = true): static
+    {
+        if ($ativo) {
+            $this->query .= " WHERE deleted_at IS NULL";
+        } else {
+            $this->query .= " WHERE deleted_at IS NOT NULL";
+        }
         return $this;
     }
 
@@ -155,9 +170,10 @@ abstract class Modelo
      * @return array Array de objetos da classe que estende este Modelo.
      * @see buscar() Inicia a montagem da query.
      */
-    public function resultado(): array
+    public function resultado(string $estrutura = 'objeto'): array
     {
         $query = $this->query;
+        $estrutura = strtolower($estrutura);
 
 
         if (!empty($this->ordem)) {
@@ -168,7 +184,21 @@ abstract class Modelo
             $query .= " LIMIT {$this->limite} OFFSET {$this->offset}";
         }
 
-        return $this->conection->select($query, $this->parametros ?? null, static::class);
+        // Ao invés de retornar o objeto inteiro, seria melhor retonar um \stdClass para não expor métodos internos do Modelo. Isso mantém o encapsulamento e a segurança. Ou poderia retornar um array de arrays associativos, não pasasndo o argumento static::class, mas isso depende de como você quer que os dados sejam manipulados fora do modelo.
+        $resultado = match ($estrutura) {
+            'objeto'      => $this->conection->select($query, $this->parametros, static::class),
+            'associativo' => $this->conection->select($query, $this->parametros),
+            default       => throw new \InvalidArgumentException("Estrutura inválida: {$estrutura}. Use 'objeto' ou 'associativo'."),
+        };
+
+        if ($estrutura === 'objeto' && is_array($resultado)) {
+            foreach ($resultado as $indice => $objeto) {
+                $resultado[$indice] = $objeto->getDados();
+            }
+        }
+
+        return $resultado ?? [];
+
     }
 
     /**
@@ -222,7 +252,7 @@ abstract class Modelo
 
         $atualizado = $this->buscarPorId($this->id);
         if ($atualizado) {
-            $this->dados = $atualizado->dados();
+            $this->dados = $atualizado->getDados();
         }
 
         return true;
@@ -242,14 +272,12 @@ abstract class Modelo
         try {
             $this->erro->limparErro();
 
-            $dados = $this->$dados;
-
-            $set = [];
-            foreach ($dados as $key => $value) {
-                $set[] = "{$key} = :{$key}";
+            $assignments = [];
+            foreach ($dados as $campo => $valor) {
+                $assignments[] = "{$campo} = :{$campo}";
             }
-            $setString = implode(', ', $set);
-            $query = "UPDATE {$this->tabela} SET {$setString} WHERE {$where}";
+            $setters = implode(', ', $assignments);
+            $query = "UPDATE {$this->tabela} SET {$setters} WHERE {$where}";
 
             $this->conection->update($query, array_merge($dados, $parametros));
 
@@ -311,11 +339,75 @@ abstract class Modelo
     *
     * @see buscar() Alternativa mais flexível para consultas customizadas
      */
-    public function buscarPorId(int $id): ?object
+    public function buscarPorId(int $id, string $estrutura = 'objeto'): \stdClass|array|null
     {
-        $this->buscar('id = :id', "id={$id}");
-        $resultado = $this->resultado();
+        $resultado = $this->buscar('id = :id', ["id" => $id])->resultado($estrutura);
         return !empty($resultado) ? $resultado[0] : null;
+    }
+
+    /**
+     * Marca um registro como excluído sem removê-lo fisicamente do banco de dados.
+     * Em caso de falha, registra uma mensagem de feedback em $this->erro e relança a exceção.
+     *
+     * @param int $id Identificador do registro a marcar como excluído
+     *
+     * @return bool True quando a atualização é executada com sucesso
+     *
+     * @throws \PDOException Se ocorrer uma falha ao atualizar o registro
+     */
+    public function delete(int $id, ?array $relacionamento = null, ?string $campoReferencia = null): bool
+    {
+        try {
+            $this->erro->limparErro();
+
+            $query = "DELETE FROM {$this->tabela} WHERE id = :id";
+            $this->conection->delete($query, ['id' => $id]);
+
+            return true;
+        } catch (\PDOException $hardDelete) {
+            // é útil definir uma mensagem de erro para feedback, mesmo que a exceção seja lançada?
+            $this->erro->definirMensagem('Delete físico falhou (provavelmente por relacionamentos). Tentando Soft Delete...\n');
+
+            try {
+                //$chaveEstrangeira = [layout_machine = fk_id_machine]
+                //$campoReferencia = 'fk_id_layout'
+                // id é a chave primária da tabela atual e precisa ser passada como parâmetro quando for executada a query
+
+                $tabelaRelacionada = key($relacionamento);
+                $chaveEstrangeira = $relacionamento[$tabelaRelacionada];
+                $querys = [];
+
+                //o campo de referência é a coluna da tabela relacionada que aponta para os registro mais importantes, ou seja, os fk_id da tabela layout. Já os $registrosDependetes são os ids da tabela layout.
+                //passo 2 [fk_id_layout =[ 1,2,3]] configurar PDO para columnar os resultados e retornar um array de valores, não um array de arrays associativos
+                $querys[] = $registrosDependetes =
+                "SELECT {$campoReferencia} FROM {$tabelaRelacionada} WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}";
+
+                $querys[] = $deletarRegistroPai =
+                "UPDATE {$this->tabela} SET deleted_at = NOW() WHERE id = :id";
+
+                $querys[] = $deletarRegistrosFilhos =
+                "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}"; // passo 3
+
+                //Isso é um array
+                //necessário retirar id dos dados
+                //melhor trazer os dados em colunas e retirar a coluna id do array, para não precisar fazer um foreach e retirar o id de cada registro. Apenas tentar usar o array_column com array_map para trazer apenas os valores da coluna desejada. Isso evita a necessidade de percorrer cada registro e remover o id manualmente, tornando o código mais eficiente e limpo.
+                $querys[] = $GetRegistrosAntigos = // passo 4
+                "SELECT * FROM {$tabelaRelacionada} WHERE $campoReferencia IN ($registrosDependetes) AND deleted_at IS NOT NULL";
+
+
+                $querys[] = $deletarRegistrosRelacionados = // passo 5
+                "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE $campoReferencia IN ($registrosDependetes)";
+
+                $Recadastro = null;  //passo 6 chama a função insertComDependencia dentro do EasyPDO para recadastrar os registros filhos que foram deletados, mas que ainda são necessários para manter a integridade referencial. Isso pode envolver a criação de uma nova entrada na tabela relacionada com os mesmos dados, mas com um novo ID, ou a restauração de registros previamente marcados como deletados.
+
+                $this->conection->softDelete($querys, ['id' => $id, $chaveEstrangeira => $id]);
+
+                return true;
+            } catch (\PDOException $softDelete) {
+                $this->erro->definirMensagem('Soft Delete falhou. Registro não foi excluído.');
+                throw $softDelete;
+            }
+        }
     }
 
     /**
@@ -423,8 +515,13 @@ abstract class Modelo
      *
      * @return mixed Os dados armazenados no objeto, geralmente um stdClass ou array de resultados.
      */
-    protected function dados(): mixed
+    protected function getDados(): mixed
     {
         return $this->dados;
+    }
+
+    protected function limparDados()
+    {
+        unset($this->dados);
     }
 }
