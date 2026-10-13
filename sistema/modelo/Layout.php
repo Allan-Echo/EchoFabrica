@@ -11,9 +11,9 @@ class Layout extends Modelo
         parent::__construct('layout');
     }
 
-    public function cadastrarLayout(array $dados): void
+    /* public function cadastrarLayout(array $dados): void
     {
-        $query = "INSERT INTO {$this->tabela} (denomination, observation) 
+        $query = "INSERT INTO {$this->tabela} (denomination, observation)
       VALUES (:nome,:descricao)";
 
         $this->conection->insert($query, $dados);
@@ -23,12 +23,6 @@ class Layout extends Modelo
     {
         $query = "SELECT * FROM {$this->tabela}";
 
-        return $this->conection->select($query);
-    }
-
-    public function buscarLayout(): array
-    {
-        $query = "SELECT * FROM {$this->tabela} ORDER BY denomination ASC";
         return $this->conection->select($query);
     }
 
@@ -44,5 +38,5 @@ class Layout extends Modelo
     {
         $query = "DELETE FROM {$this->tabela} WHERE id_layout = $id";
         $this->conection->delete($query);
-    }
+    } */
 }
