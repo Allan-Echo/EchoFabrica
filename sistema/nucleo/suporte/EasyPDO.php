@@ -524,4 +524,23 @@ class EasyPDO
             throw $e;
         }
     }
+
+    public function softDelete(array $querys, array $params = []): void
+    {
+        $this->connection->beginTransaction();
+
+        try {
+            foreach ($querys as $query) {
+                $stmt = $this->connection->prepare($query);
+                $stmt->execute($params);
+            }
+            $this->connection->commit();
+            $this->connection = null;
+        } catch (\Throwable $e) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+            throw $e;
+        }
+    }
 }
