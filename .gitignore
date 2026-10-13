@@ -18,6 +18,9 @@ relatorio.json
 phpcs_output.json
 
 #outros
+PHPStan
+.husky
+commitlint.config.js
 cookie.txt
 gerar_relatorio.php
 fix-except.ps1
