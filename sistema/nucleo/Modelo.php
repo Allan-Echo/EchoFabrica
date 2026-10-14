@@ -355,7 +355,7 @@ abstract class Modelo
      *
      * @throws \PDOException Se ocorrer uma falha ao atualizar o registro
      */
-    public function delete(int $id, ?array $relacionamento = null, ?string $campoReferencia = null): bool
+    public function deletar(int $id, ?array $relacionamento = null, ?string $campoReferencia = null): bool
     {
         try {
             $this->erro->limparErro();
@@ -375,32 +375,44 @@ abstract class Modelo
 
                 $tabelaRelacionada = key($relacionamento);
                 $chaveEstrangeira = $relacionamento[$tabelaRelacionada];
-                $querys = [];
-
+                $this->selectQuerys = [];
+                $this->updateQuerys = [];
+                $this->selectRespostas = ['idsCampoReferencia' => [], 'GetRegistrosAntigos' => []];
                 //o campo de referência é a coluna da tabela relacionada que aponta para os registro mais importantes, ou seja, os fk_id da tabela layout. Já os $registrosDependetes são os ids da tabela layout.
                 //passo 2 [fk_id_layout =[ 1,2,3]] configurar PDO para columnar os resultados e retornar um array de valores, não um array de arrays associativos
-                $querys[] = $registrosDependetes =
-                "SELECT {$campoReferencia} FROM {$tabelaRelacionada} WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}";
+                $this->selectQuerys['idsCampoReferencia'] =
+                ['query' => "SELECT {$campoReferencia} FROM {$tabelaRelacionada} WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}",
+                 'parametros' => [$chaveEstrangeira => $id]
+                ];
 
-                $querys[] = $deletarRegistroPai =
-                "UPDATE {$this->tabela} SET deleted_at = NOW() WHERE id = :id";
+                $this->updateQuerys['deletarRegistroPai'] =
+                [
+                    'query' => "UPDATE {$this->tabela} SET deleted_at = NOW() WHERE id = :id",
+                    'parametros' => ['id' => $id]
+                ];
 
-                $querys[] = $deletarRegistrosFilhos =
-                "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}"; // passo 3
+                $this->updateQuerys['deletarRegistrosFilhos'] = [
+                    'query' => "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}",
+                    'parametros' => [$chaveEstrangeira => $id]
+                ]; // passo 3
 
                 //Isso é um array
                 //necessário retirar id dos dados
                 //melhor trazer os dados em colunas e retirar a coluna id do array, para não precisar fazer um foreach e retirar o id de cada registro. Apenas tentar usar o array_column com array_map para trazer apenas os valores da coluna desejada. Isso evita a necessidade de percorrer cada registro e remover o id manualmente, tornando o código mais eficiente e limpo.
-                $querys[] = $GetRegistrosAntigos = // passo 4
-                "SELECT * FROM {$tabelaRelacionada} WHERE $campoReferencia IN ($registrosDependetes) AND deleted_at IS NOT NULL";
+                $idsCampoReferencia = implode(', ', $this->selectRespostas['idsCampoReferencia'] ?? []);
 
+                // passo 4, apenas os registros de associação que foram deletados, mas os registro da tabela intermediaria apenas. Precisamos criar recadastrar na tabela layout primeiro e depois na tabela intermediaria, é necessário um join que pegue os dados da tabela pai e fazer um insert primeiro na tabela pai com atomicidade e depois na tabela intermediaria, para não perder a integridade referencial. O ideal é criar uma transação que faça o insert na tabela pai e depois na tabela intermediaria, garantindo que ambos os inserts sejam bem-sucedidos ou nenhum seja aplicado.
+                $this->selectQuerys['GetRegistrosAntigos'] =
+                ['query' => "SELECT * FROM {$tabelaRelacionada} WHERE {$campoReferencia} IN ({$idsCampoReferencia}) AND deleted_at IS NOT NULL"
+                ];
 
-                $querys[] = $deletarRegistrosRelacionados = // passo 5
-                "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE $campoReferencia IN ($registrosDependetes)";
+                $this->updateQuerys['deletarRegistrosRelacionados'] = // passo 5
+                ['query' => "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE {$campoReferencia} IN ({$idsCampoReferencia})"
+                ];
 
                 $Recadastro = null;  //passo 6 chama a função insertComDependencia dentro do EasyPDO para recadastrar os registros filhos que foram deletados, mas que ainda são necessários para manter a integridade referencial. Isso pode envolver a criação de uma nova entrada na tabela relacionada com os mesmos dados, mas com um novo ID, ou a restauração de registros previamente marcados como deletados.
 
-                $this->conection->softDelete($querys, ['id' => $id, $chaveEstrangeira => $id]);
+                $this->conection->softDelete($this->updateQuerys, ['id' => $id, $chaveEstrangeira => $id]);
 
                 return true;
             } catch (\PDOException $softDelete) {
