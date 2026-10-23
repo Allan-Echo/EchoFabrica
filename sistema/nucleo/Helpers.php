@@ -70,19 +70,10 @@ class Helpers
     public static function extrairTrecho(string $texto, string $marcadorInicial, ?string $marcadorFinal = null): string
     {
         if ($marcadorFinal === null) {
-            $trecho = strstr($texto, $marcadorInicial);
-            if ($trecho === false) {
-                throw new \InvalidArgumentException('O marcador inicial não foi encontrado no texto.');
-            }
-
-            return $trecho;
+            return Helpers::buscarTrecho($texto, $marcadorInicial);
         }
 
-        $posicaoInicial = stripos($texto, $marcadorInicial);
-        if ($posicaoInicial === false) {
-            throw new \InvalidArgumentException('O marcador inicial não foi encontrado no texto.');
-        }
-
+        $posicaoInicial = Helpers::buscarPosicao($texto, $marcadorInicial);
         $posicaoFinal = strpos($texto, $marcadorFinal, $posicaoInicial);
         $comprimentoTrecho = $posicaoFinal === false
             ? null
@@ -90,4 +81,25 @@ class Helpers
 
         return substr($texto, $posicaoInicial, $comprimentoTrecho);
     }
+
+    private static function buscarTrecho(string $texto, string $marcadorInicial): string
+    {
+        $trecho = strstr($texto, $marcadorInicial);
+        if ($trecho === false) {
+            throw new \InvalidArgumentException('O marcador inicial não foi encontrado no texto.');
+        }
+
+        return $trecho;
+    }
+    private static function buscarPosicao(string $texto, string $marcadorInicial): int
+    {
+        $posicaoMarcador = stripos($texto, $marcadorInicial);
+        if ($posicaoMarcador === false) {
+            throw new \InvalidArgumentException('O marcador inicial não foi encontrado no texto.');
+        }
+
+        return $posicaoMarcador;
+    }
+
+
 }
