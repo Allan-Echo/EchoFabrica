@@ -82,24 +82,68 @@ class Helpers
         return substr($texto, $posicaoInicial, $comprimentoTrecho);
     }
 
-    private static function buscarTrecho(string $texto, string $marcadorInicial): string
+    // extrairEntreRev() seria mais intuitivo?
+    public static function extrairTrechoReverso(string $texto, string $marcadorChave, ?string $marcadorAnterior = null): string
     {
-        $trecho = strstr($texto, $marcadorInicial);
+        if ($marcadorAnterior === null) {
+            return Helpers::buscarTrecho($texto, $marcadorChave, true);
+        } else {
+            $posicaoChave = Helpers::buscarPosicao($texto, $marcadorChave);
+            $posicaoMarcadorAnterior = Helpers::buscarPosicaoReverso($texto, $marcadorAnterior, $posicaoChave);
+            $comprimentoTrecho = $posicaoChave - $posicaoMarcadorAnterior;
+
+            return substr($texto, $posicaoMarcadorAnterior, $comprimentoTrecho);
+        }
+    }
+
+    private static function buscarTrecho(string $texto, string $marcadorInicial, bool $antesDoMarcador = false): string
+    {
+        if ($antesDoMarcador) {
+            $trecho = strstr($texto, $marcadorInicial, $antesDoMarcador);
+        } else {
+            $trecho = strstr($texto, $marcadorInicial);
+        }
+
         if ($trecho === false) {
             throw new \InvalidArgumentException('O marcador inicial não foi encontrado no texto.');
         }
 
         return $trecho;
     }
-    private static function buscarPosicao(string $texto, string $marcadorInicial): int
+    private static function buscarPosicao(string $texto, string $marcadorChave, bool $inverterDirecao = false): int
     {
-        $posicaoMarcador = stripos($texto, $marcadorInicial);
+        if ($inverterDirecao) {
+            $posicaoMarcador = strrpos($texto, $marcadorChave);
+        } else {
+            $inicioMarcadorChave = stripos($texto, $marcadorChave);
+            $comprimentoMarcadorChave = strlen($marcadorChave);
+            $posicaoMarcador = $inicioMarcadorChave + $comprimentoMarcadorChave;
+        }
+
         if ($posicaoMarcador === false) {
-            throw new \InvalidArgumentException('O marcador inicial não foi encontrado no texto.');
+            throw new \InvalidArgumentException('O marcador não foi encontrado no texto.');
         }
 
         return $posicaoMarcador;
     }
 
+    private static function buscarPosicaoReverso(string $texto, string $marcadorBuscado, int $posicaoChave): int
+    {
+        $posicaoBuscada = null;
+        $comprimentoBuscado = strlen($marcadorBuscado);
 
+        for ($i = $posicaoChave; $i >= 0 ; $i--) {
+            if (substr($texto, $i, $comprimentoBuscado) === $marcadorBuscado) {
+                $posicaoBuscada = $i;
+                break;
+            }
+        }
+
+        if (is_int($posicaoBuscada)) {
+            return $posicaoBuscada;
+        } else {
+            throw new \InvalidArgumentException('O marcador não foi encontrado no texto.');
+        }
+
+    }
 }
