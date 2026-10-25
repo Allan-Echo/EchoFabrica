@@ -355,13 +355,13 @@ abstract class Modelo
      *
      * @throws \PDOException Se ocorrer uma falha ao atualizar o registro
      */
-    public function deletar(int $id, ?array $relacionamento = null, ?string $campoReferencia = null): bool
+    public function deletar(int $maquinaId, ?Modelo $tabelaIntermediaria = null, ?Modelo $tabelaRelacionada = null, ?array $colunasRelacionadas = null): bool
     {
         try {
             $this->erro->limparErro();
 
             $query = "DELETE FROM {$this->tabela} WHERE id = :id";
-            $this->conection->delete($query, ['id' => $id]);
+            $this->conection->delete($query, ['id' => $maquinaId]);
 
             return true;
         } catch (\PDOException $hardDelete) {
@@ -369,50 +369,71 @@ abstract class Modelo
             $this->erro->definirMensagem('Delete físico falhou (provavelmente por relacionamentos). Tentando Soft Delete...\n');
 
             try {
-                //$chaveEstrangeira = [layout_machine = fk_id_machine]
-                //$campoReferencia = 'fk_id_layout'
+                //$relacionamento = [layout_machine = fk_id_machine] ou o inverso?
+                //$tabelaIntermediaria = 'layout_machine'
+                //$colunaIdMaquina = 'fk_id_machine'
+                //colunasRelacionadas$colunasRelacionadas$colunasRelacionadas = 'fk_id_layout'
                 // id é a chave primária da tabela atual e precisa ser passada como parâmetro quando for executada a query
 
-                $tabelaRelacionada = key($relacionamento);
-                $chaveEstrangeira = $relacionamento[$tabelaRelacionada];
+                $nometabelaIntermediaria = $tabelaIntermediaria->getNomeTabela();
+                $colunaChavesIntermediarias = $tabelaIntermediaria->getColunas();
+                $colunaIdMaquina =
+                Helpers::extrairTrecho($colunaChavesIntermediarias, 'fk_id_machine,', ','); // precisa de selectQuery
+                $colunaIdLayout = 'fk_id_layout'; // precisa de selectQuery
+                $nometabelaRelacionada = $tabelaRelacionada->getNomeTabela();
+                $colunasRelacionadas = 'id, denomination, observation'; // precisa de selectQuery
+                $colunaIdRelacionada = Helpers::extrairTrecho($colunasRelacionadas, 'id', ',');
                 $this->selectQuerys = [];
                 $this->updateQuerys = [];
-                $this->selectRespostas = ['idsCampoReferencia' => [], 'GetRegistrosAntigos' => []];
+                $this->insertQuerys = [];
+                $this->selectRespostas = ['idsCampoRelacionado' => [], 'GetRegistrosAtualizados' => []];
                 //o campo de referência é a coluna da tabela relacionada que aponta para os registro mais importantes, ou seja, os fk_id da tabela layout. Já os $registrosDependetes são os ids da tabela layout.
                 //passo 2 [fk_id_layout =[ 1,2,3]] configurar PDO para columnar os resultados e retornar um array de valores, não um array de arrays associativos
-                $this->selectQuerys['idsCampoReferencia'] =
-                ['query' => "SELECT {$campoReferencia} FROM {$tabelaRelacionada} WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}",
-                 'parametros' => [$chaveEstrangeira => $id]
+                $this->selectQuerys['idsCampoRelacionado'] =
+                [
+                    'query' => "SELECT {$colunaIdLayout} FROM {$tabelaIntermediaria} WHERE {$colunaIdMaquina} = :{$colunaIdMaquina}",
+                    'parametros' => [$colunaIdMaquina => $maquinaId]
                 ];
+
+                $this->idsCampoRelacionado = $selectRespostas['idsCampoRelacionado'] ?? null;
 
                 $this->updateQuerys['deletarRegistroPai'] =
                 [
                     'query' => "UPDATE {$this->tabela} SET deleted_at = NOW() WHERE id = :id",
-                    'parametros' => ['id' => $id]
+                    'parametros' => ['id' => $maquinaId]
                 ];
 
-                $this->updateQuerys['deletarRegistrosFilhos'] = [
-                    'query' => "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE {$chaveEstrangeira} = :{$chaveEstrangeira}",
-                    'parametros' => [$chaveEstrangeira => $id]
+                $this->updateQuerys['deletarRegistrosFilhos'] =
+                [
+                    'query' => "UPDATE {$tabelaIntermediaria} SET deleted_at = NOW() WHERE {$colunaIdMaquina} = :{$colunaIdMaquina}",
+                    'parametros' => [$colunaIdMaquina => $maquinaId]
                 ]; // passo 3
 
                 //Isso é um array
                 //necessário retirar id dos dados
                 //melhor trazer os dados em colunas e retirar a coluna id do array, para não precisar fazer um foreach e retirar o id de cada registro. Apenas tentar usar o array_column com array_map para trazer apenas os valores da coluna desejada. Isso evita a necessidade de percorrer cada registro e remover o id manualmente, tornando o código mais eficiente e limpo.
-                $idsCampoReferencia = implode(', ', $this->selectRespostas['idsCampoReferencia'] ?? []);
+                $idsCampoRelacionado = implode(', ', $this->selectRespostas['idsCampoRelacionado'] ?? []);
 
-                // passo 4, apenas os registros de associação que foram deletados, mas os registro da tabela intermediaria apenas. Precisamos criar recadastrar na tabela layout primeiro e depois na tabela intermediaria, é necessário um join que pegue os dados da tabela pai e fazer um insert primeiro na tabela pai com atomicidade e depois na tabela intermediaria, para não perder a integridade referencial. O ideal é criar uma transação que faça o insert na tabela pai e depois na tabela intermediaria, garantindo que ambos os inserts sejam bem-sucedidos ou nenhum seja aplicado.
-                $this->selectQuerys['GetRegistrosAntigos'] =
-                ['query' => "SELECT * FROM {$tabelaRelacionada} WHERE {$campoReferencia} IN ({$idsCampoReferencia}) AND deleted_at IS NOT NULL"
+                // passo 4, buscar os dados atualizados para recadastrar os registros filhos que não foram deletados para criar um novo registro na tabela relacionada, mantendo a integridade referencial. Isso pode envolver a criação de uma nova entrada na tabela relacionada com os mesmos dados, mas com um novo ID, ou a restauração de registros previamente marcados como deletados.
+                $this->selectQuerys['GetRegistrosAtualizados'] =
+                ['query' => "SELECT * FROM 'vw_layouts_ativos' WHERE {$colunaIdLayout} IN ({$this->idsCampoRelacionado})"
                 ];
 
-                $this->updateQuerys['deletarRegistrosRelacionados'] = // passo 5
-                ['query' => "UPDATE {$tabelaRelacionada} SET deleted_at = NOW() WHERE {$campoReferencia} IN ({$idsCampoReferencia})"
+                $this->updateQuerys['deletarRegistrosAssociados'] = // passo 5
+                ['query' => "UPDATE {$tabelaIntermediaria} SET deleted_at = NOW() WHERE {$colunaIdLayout} IN ({$idsCampoRelacionado})"
                 ];
 
-                $Recadastro = null;  //passo 6 chama a função insertComDependencia dentro do EasyPDO para recadastrar os registros filhos que foram deletados, mas que ainda são necessários para manter a integridade referencial. Isso pode envolver a criação de uma nova entrada na tabela relacionada com os mesmos dados, mas com um novo ID, ou a restauração de registros previamente marcados como deletados.
+                $this->updateQuerys['deletarEmTabelaRelacionada'] =
+                [
+                    'query' => "UPDATE {$nometabelaRelacionada} SET deleted_at = NOW() WHERE {$colunaIdRelacionada} IN ({$idsCampoRelacionado})"
+                ];
 
-                $this->conection->softDelete($this->updateQuerys, ['id' => $id, $chaveEstrangeira => $id]);
+                $this->insertQuerys['layoutAtualizado'] =
+                [
+                    'query' => "INSERT "
+                ];
+
+                $this->conection->softDelete($this->updateQuerys, ['id' => $maquinaId, $colunaIdMaquina => $maquinaId]);
 
                 return true;
             } catch (\PDOException $softDelete) {
@@ -535,5 +556,15 @@ abstract class Modelo
     protected function limparDados()
     {
         unset($this->dados);
+    }
+
+    protected function getNomeTabela(): string
+    {
+        return $this->tabela;
+    }
+
+    protected function getColunas(): string
+    {
+        return $this->colunas;
     }
 }
