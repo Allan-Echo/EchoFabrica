@@ -75,20 +75,16 @@ class Helpers
 
         $posicaoInicial = Helpers::obterPosicaoMarcador($texto, $marcadorInicial);
 
-        // tem diferença entre caracters especiais entre strpos e stripos?
-        $iniciaMarcadorFinal = strpos($texto, $marcadorFinal, $posicaoInicial);
+        $inicioMarcadorFinal = Helpers::obterPosicaoMarcador($texto, $marcadorFinal, $posicaoInicial);
         $tamanhoMarcadorFinal = strlen($marcadorFinal);
 
-        $posicaoFinal = $iniciaMarcadorFinal + $tamanhoMarcadorFinal;
+        $posicaoFinal = $inicioMarcadorFinal + $tamanhoMarcadorFinal;
 
-        $tamanhoTrecho = $posicaoFinal === false
-            ? null
-            : $posicaoFinal - $posicaoInicial;
+        $tamanhoTrecho = $posicaoFinal - $posicaoInicial;
 
         return substr($texto, $posicaoInicial, $tamanhoTrecho);
     }
 
-    // extrairEntreRev() seria mais intuitivo?
     public static function extrairAteMarcadorAnterior(string $texto, string $marcadorChave, ?string $marcadorAnterior = null): string
     {
         if ($marcadorAnterior === null) {
@@ -111,7 +107,7 @@ class Helpers
     {
         $trecho = $antesDoMarcador
             ? strstr($texto, $marcador, true)
-            : strstr($texto, $marcador, true);
+            : strstr($texto, $marcador);
 
         if ($trecho === false) {
             throw new \InvalidArgumentException('O marcador informado não foi encontrado no texto.');
@@ -119,9 +115,11 @@ class Helpers
 
         return $trecho;
     }
-    private static function obterPosicaoMarcador(string $texto, string $marcador): int
+    private static function obterPosicaoMarcador(string $texto, string $marcador, int $posicaoInicial = 0): int
     {
-        $posicaoMarcador = stripos($texto, $marcador);
+        $posicaoMarcador = $posicaoInicial > 0
+            ? stripos($texto, $marcador, $posicaoInicial)
+            : stripos($texto, $marcador);
 
         if ($posicaoMarcador === false) {
             throw new \InvalidArgumentException('O marcador não foi encontrado no texto.');
@@ -136,7 +134,10 @@ class Helpers
         $tamanhoMarcador = strlen($marcador);
 
         for ($i = $posicaoLimite; $i >= 0 ; $i--) {
-            if (substr($texto, $i, $tamanhoMarcador) === $marcador) {
+
+            $trechoAtual = substr($texto, $i, $tamanhoMarcador);
+
+            if (strtolower($trechoAtual) === strtolower($marcador)) {
                 $posicaoEncontrada = $i;
                 break;
             }
