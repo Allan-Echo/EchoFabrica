@@ -2,6 +2,7 @@
 
 namespace sistema\modelo;
 
+use sistema\nucleo\Helpers;
 use sistema\nucleo\Modelo;
 
 /**
@@ -46,7 +47,8 @@ class LayoutMaquina extends Modelo
      */
     public function montarLayout(Layout $layout, array $maquinas): static
     {
-        $cadastroLayout = $layout->prepararCadastro()->query;
+        $cadastroLayout = $layout->prepararCadastro()->obterQuery();
+
         $moldeLayoutMaquina = $this->montarMolde($maquinas);
 
         $id_layout = $this->conection->insertComDependencia($cadastroLayout, $layout->dadosComoArray(), $moldeLayoutMaquina);
@@ -116,5 +118,19 @@ class LayoutMaquina extends Modelo
         ORDER BY fk_id_machine ASC";
 
         return $this->conection->select($query);
+    }
+
+    public function removerMaquina(int $maquinaId): bool
+    {
+
+    }
+
+    private function buscarLayoutAfetados(int $maquinaId): array
+    {
+        $colunaIdMaquina = Helpers::extrairAteMarcadorAnterior($this->colunas, 'machine', 'fk');
+
+        $layoutIds = $this->buscar("{$colunaIdMaquina} = :{$colunaIdMaquina}", ['fk_id_machine' => $maquinaId])->resultado('associativo');
+
+        return array_column($layoutIds, 'fk_id_layout');
     }
 }
