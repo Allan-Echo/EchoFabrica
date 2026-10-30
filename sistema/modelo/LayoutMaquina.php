@@ -21,9 +21,11 @@ use sistema\nucleo\Modelo;
  */
 class LayoutMaquina extends Modelo
 {
+    protected ?string $colunas = 'fk_id_layout, fk_id_machine';
+
     public function __construct()
     {
-        parent::__construct('layout_machine', 'fk_id_layout, fk_id_machine');
+        parent::__construct('layout_machine');
     }
 
     /**
