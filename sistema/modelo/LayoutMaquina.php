@@ -2,7 +2,6 @@
 
 namespace sistema\modelo;
 
-use sistema\nucleo\Helpers;
 use sistema\nucleo\Modelo;
 
 /**
