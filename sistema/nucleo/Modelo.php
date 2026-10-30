@@ -192,7 +192,7 @@ abstract class Modelo
 
         if ($estrutura === 'objeto' && is_array($resultado)) {
             foreach ($resultado as $indice => $objeto) {
-                $resultado[$indice] = $objeto->getDados();
+                $resultado[$indice] = $objeto->obterDados();
             }
         }
 
@@ -251,7 +251,7 @@ abstract class Modelo
 
         $atualizado = $this->buscarPorId($this->id);
         if ($atualizado) {
-            $this->dados = $atualizado->getDados();
+            $this->dados = $atualizado->obterDados();
         }
 
         return true;
@@ -547,7 +547,7 @@ abstract class Modelo
      *
      * @return mixed Os dados armazenados no objeto, geralmente um stdClass ou array de resultados.
      */
-    protected function getDados(): mixed
+    protected function obterDados(): mixed
     {
         return $this->dados;
     }
@@ -557,13 +557,18 @@ abstract class Modelo
         unset($this->dados);
     }
 
-    protected function getNomeTabela(): string
+    protected function obterNomeTabela(): string
     {
         return $this->tabela;
     }
 
-    protected function getColunas(): string
+    protected function obterColunas(): string
     {
         return $this->colunas;
+    }
+
+    protected function obterQuery(): mixed
+    {
+        return $this->query;
     }
 }
