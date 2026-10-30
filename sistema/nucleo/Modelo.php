@@ -374,14 +374,14 @@ abstract class Modelo
                 //colunasRelacionadas$colunasRelacionadas$colunasRelacionadas = 'fk_id_layout'
                 // id é a chave primária da tabela atual e precisa ser passada como parâmetro quando for executada a query
 
-                $nometabelaIntermediaria = $tabelaIntermediaria->getNomeTabela();
-                $colunaChavesIntermediarias = $tabelaIntermediaria->getColunas();
+                $nometabelaIntermediaria = $tabelaIntermediaria->obterNomeTabela();
+                $colunaChavesIntermediarias = $tabelaIntermediaria->obterColunas();
                 $colunaIdMaquina =
-                Helpers::extrairTrecho($colunaChavesIntermediarias, 'fk_id_machine,', ','); // precisa de selectQuery
+                // Helpers::extrairTrecho($colunaChavesIntermediarias, 'fk_id_machine,', ','); // precisa de selectQuery
                 $colunaIdLayout = 'fk_id_layout'; // precisa de selectQuery
-                $nometabelaRelacionada = $tabelaRelacionada->getNomeTabela();
+                $nometabelaRelacionada = $tabelaRelacionada->obterNomeTabela();
                 $colunasRelacionadas = 'id, denomination, observation'; // precisa de selectQuery
-                $colunaIdRelacionada = Helpers::extrairTrecho($colunasRelacionadas, 'id', ',');
+                // $colunaIdRelacionada = Helpers::extrairTrecho($colunasRelacionadas, 'id', ',');
                 $this->selectQuerys = [];
                 $this->updateQuerys = [];
                 $this->insertQuerys = [];
@@ -422,10 +422,10 @@ abstract class Modelo
                 ['query' => "UPDATE {$tabelaIntermediaria} SET deleted_at = NOW() WHERE {$colunaIdLayout} IN ({$idsCampoRelacionado})"
                 ];
 
-                $this->updateQuerys['deletarEmTabelaRelacionada'] =
+                /* $this->updateQuerys['deletarEmTabelaRelacionada'] =
                 [
                     'query' => "UPDATE {$nometabelaRelacionada} SET deleted_at = NOW() WHERE {$colunaIdRelacionada} IN ({$idsCampoRelacionado})"
-                ];
+                ]; */
 
                 $this->insertQuerys['layoutAtualizado'] =
                 [
