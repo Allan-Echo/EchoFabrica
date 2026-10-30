@@ -93,45 +93,93 @@ class LayoutMaquina extends Modelo
         return $this;
     }
 
-    /**
-     * Busca as máquinas associadas a um layout.
-     *
-     * Consulta os vínculos da tabela `layout_machine`, obtém os dados de cada
-     * máquina correspondente e ordena os resultados pelo ID da máquina em
-     * ordem crescente. O método é mantido por compatibilidade com os pontos
-     * da aplicação que ainda utilizam esta consulta legada.
-     *
-     * Exemplo:
-     * ```php
-     * $maquinas = $layoutMaquina->buscarLayoutMachine('12');
-     * // [
-     * //     ['id_machine' => 1, 'model' => '...', 'designation' => '...'],
-     * //     ['id_machine' => 3, 'model' => '...', 'designation' => '...'],
-     * // ]
-     * ```
-     *
-     * @param string $layout ID do layout usado para localizar as máquinas associadas.
-     * @return list<array{id_machine: int|string, model: string, designation: string}> Máquinas encontradas, cada uma com seu ID, modelo e designação.
-     */
-    public function buscarLayoutMachine(string $layout): array
+    public function removerMaquina(int $maquinaId)//: bool
     {
-        $query = "SELECT m.id_machine, m.model, m.designation FROM {$this->tabela} AS lm JOIN machine AS m ON lm.fk_id_machine = m.id_machine WHERE fk_id_layout = $layout 
-        ORDER BY fk_id_machine ASC";
+        $this->verificarExistenciaMaquina($maquinaId);
 
-        return $this->conection->select($query);
+        if (!$this->existeAssociacao($maquinaId)) {
+            $this->hardDelete($maquinaId);
+        } else {
+            $layoutsAfetadosIds = $this->obterLayoutsAfetados($maquinaId);
+        }
     }
 
-    public function removerMaquina(int $maquinaId): bool
+    private function verificarExistenciaMaquina(int $maquinaId): true
     {
+        $selectQuery = "SELECT id FROM machine WHERE id = :id";
 
+        $registro = $this->conection->select($selectQuery, ['id' => $maquinaId]);
+
+        if (empty($registro)) {
+            throw new \InvalidArgumentException("Máquina sem cadastro existente");
+        }
+
+        return true;
     }
 
-    private function buscarLayoutAfetados(int $maquinaId): array
+    private function existeAssociacao(int $maquinaId): bool
     {
-        $colunaIdMaquina = Helpers::extrairAteMarcadorAnterior($this->colunas, 'machine', 'fk');
+        $selectQuery = "SELECT fk_id_machine FROM layout_machine WHERE fk_id_machine =:id AND deleted_at IS NULL";
 
-        $layoutIds = $this->buscar("{$colunaIdMaquina} = :{$colunaIdMaquina}", ['fk_id_machine' => $maquinaId])->resultado('associativo');
+        $registro = $this->conection->select($selectQuery, ['id' => $maquinaId]);
 
-        return array_column($layoutIds, 'fk_id_layout');
+        if (empty($registro)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function hardDelete(int $maquinaId): void
+    {
+        $deleteQuery = "DELETE FROM machine WHERE id = :id";
+
+        $this->conection->delete($deleteQuery, ['id' => $maquinaId]);
+    }
+
+    private function obterLayoutsAfetados(int $maquinaId): array
+    {
+        $selectQuery = "SELECT fk_id_layout FROM layout_machine WHERE fk_id_machine = :id AND deleted_at IS NULL";
+
+        $resultado = $this->conection->select($selectQuery, ['id' => $maquinaId]);
+
+        return array_column($resultado, 'fk_id_layout');
+    }
+
+    private function atualizarRegistroPai(int $maquinaId): void
+    {
+        $updateQuery = "UPDATE machine SET deleted_at = NOW() WHERE id = :id";
+
+        $this->conection->update($updateQuery, ['id' => $maquinaId]);
+    }
+
+    private function atualizarMaquinasAssociados(int $maquinaId): void
+    {
+        $updateQuery = "UPDATE layout_machine SET delete_at = NOW() WHERE fk_id_machine = :id";
+
+        $this->conection->update($updateQuery, ['id' => $maquinaId]);
+    }
+
+    private function obterRegistrosAtualizados(array $layoutsAfetadosIds): array
+    {
+        $layoutsIds =  implode(',', $layoutsAfetadosIds);
+
+        $selectQuery = "SELECT * FROM wv_layout_ativos WHERE fk_id_layout IN ($layoutsIds)";
+
+        return $this->conection->select($selectQuery);
+    }
+
+    private function atualizarLayoutsAssociados(array $layoutsAfetadosIds): void
+    {
+        $layoutsIds = implode(',', $layoutsAfetadosIds);
+
+        $updateQuery = "UPDATE layout_machine SET deleted_at = NOW() WHERE fk_id_layout IN ({$layoutsIds})";
+
+        $this->conection->update($updateQuery);
+    }
+
+    private function versionarLayoutMachine(): void
+    {
+
     }
 }
