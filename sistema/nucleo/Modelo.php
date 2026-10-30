@@ -70,13 +70,12 @@ abstract class Modelo
      *
      * @param string $tabela Nome da tabela no banco de dados
      */
-    public function __construct(string $tabela, ?string $colunas = null)
+    public function __construct(string $tabela)
     {
         $this->conection = new EasyPDO();
         $this->mensagem = new Mensagem();
         $this->erro = new Erro();
         $this->tabela = $tabela;
-        $this->colunas = $colunas;
     }
 
     /**
