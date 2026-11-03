@@ -543,4 +543,28 @@ class EasyPDO
             throw $e;
         }
     }
+
+    public function transaction(callable $callback)
+    {
+        $this->connection->beginTransaction();
+
+        try {
+
+            $resultado = $callback();
+
+            $this->connection->commit();
+
+            $this->connection = null;
+
+            return $resultado;
+
+        } catch (\Throwable $e) {
+
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
+            throw $e;
+        }
+    }
 }
