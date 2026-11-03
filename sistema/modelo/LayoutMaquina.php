@@ -93,18 +93,37 @@ class LayoutMaquina extends Modelo
         return $this;
     }
 
-    public function removerMaquina(int $maquinaId)//: bool
+    public function removerMaquina(int $maquinaId): true // refatorar pra retirar true e por a instacia
     {
         $this->verificarExistenciaMaquina($maquinaId);
 
-        if (!$this->existeAssociacao($maquinaId)) {
-            $this->hardDelete($maquinaId);
+        if ($this->existeAssociacao($maquinaId)) {
+            return $this->conection->transaction(
+                function () use ($maquinaId) {
+
+                    $layoutsAfetadosIds = $this->obterLayoutsAfetados($maquinaId);
+
+                    $this->softDeleteMaquina($maquinaId);
+                    $this->softDeleteRelacionamentosDaMaquina($maquinaId);
+
+                    $layoutsAtualizados = $this->obterLayoutsAtivosAtualizados($layoutsAfetadosIds);
+
+                    $this->softDeleteVinculosDosLayouts($layoutsAfetadosIds);
+                    $this->softDeleteLayouts($layoutsAfetadosIds);
+
+                    $this->recriarLayoutsEVinculos($layoutsAtualizados);
+
+                    return true;
+                }
+            );
+
         } else {
-            $layoutsAfetadosIds = $this->obterLayoutsAfetados($maquinaId);
+            $this->hardDelete($maquinaId);
+            return true;
         }
     }
 
-    private function verificarExistenciaMaquina(int $maquinaId): true
+    private function verificarExistenciaMaquina(int $maquinaId): void
     {
         $selectQuery = "SELECT id FROM machine WHERE id = :id";
 
@@ -113,8 +132,6 @@ class LayoutMaquina extends Modelo
         if (empty($registro)) {
             throw new \InvalidArgumentException("Máquina sem cadastro existente");
         }
-
-        return true;
     }
 
     private function existeAssociacao(int $maquinaId): bool
@@ -146,21 +163,21 @@ class LayoutMaquina extends Modelo
         return array_column($resultado, 'fk_id_layout');
     }
 
-    private function atualizarRegistroPai(int $maquinaId): void
+    private function softDeleteMaquina(int $maquinaId): void
     {
         $updateQuery = "UPDATE machine SET deleted_at = NOW() WHERE id = :id";
 
         $this->conection->update($updateQuery, ['id' => $maquinaId]);
     }
 
-    private function atualizarMaquinasAssociados(int $maquinaId): void
+    private function softDeleteRelacionamentosDaMaquina(int $maquinaId): void
     {
-        $updateQuery = "UPDATE layout_machine SET delete_at = NOW() WHERE fk_id_machine = :id";
+        $updateQuery = "UPDATE layout_machine SET deleted_at = NOW() WHERE fk_id_machine = :id";
 
         $this->conection->update($updateQuery, ['id' => $maquinaId]);
     }
 
-    private function obterRegistrosAtualizados(array $layoutsAfetadosIds): array
+    private function obterLayoutsAtivosAtualizados(array $layoutsAfetadosIds): array // refatorar depois
     {
         $layoutsIds =  implode(',', $layoutsAfetadosIds);
 
@@ -169,7 +186,16 @@ class LayoutMaquina extends Modelo
         return $this->conection->select($selectQuery);
     }
 
-    private function atualizarLayoutsAssociados(array $layoutsAfetadosIds): void
+    private function softDeleteLayouts(array $layoutsAfetadosIds): void
+    {
+        $layoutsIds = implode(',', $layoutsAfetadosIds);
+
+        $updateQuery = "UPDATE layout SET deleted_at = NOW() WHERE id IN ({$layoutsIds})";
+
+        $this->conection->update($updateQuery);
+    }
+
+    private function softDeleteVinculosDosLayouts(array $layoutsAfetadosIds): void
     {
         $layoutsIds = implode(',', $layoutsAfetadosIds);
 
@@ -178,8 +204,65 @@ class LayoutMaquina extends Modelo
         $this->conection->update($updateQuery);
     }
 
-    private function versionarLayoutMachine(): void
+    private function recriarLayoutsEVinculos(array $layoutsAtualizados): void
     {
+        $layoutDados = [];
 
+        foreach ($layoutsAtualizados as $index => $registro) {
+            $layoutDados = array_filter(
+                $registro,
+                function ($coluna) {
+                    return $coluna === 'denomination' || $coluna === 'observation';
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+
+            $this->validarLayout($layoutDados);
+
+            $insertQueryLayout = $this->prepararCadastro($layoutDados)->obterQuery();
+            $layoutId = $this->conection->insertComUltimoId($insertQueryLayout, $layoutDados);
+
+            $maquinas = array_filter(
+                $registro,
+                function ($coluna) {
+                    return $coluna === 'fk_id_machine';
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+
+            $this->validarMaquinas($maquinas);
+
+            $maquinas = explode(',', current($maquinas));
+
+            foreach ($maquinas as $maquina) {
+
+                $insertLayoutMachine =
+                "INSERT INTO {$this->tabela} ({$this->colunas}) VALUES ({$layoutId}, {$maquina})";
+
+                $this->conection->insert($insertLayoutMachine);
+            }
+        }
+    }
+
+    private function validarLayout(array $layoutDados): void
+    {
+        $colunasRequeridas = ['denomination', 'observation'];
+
+        foreach ($colunasRequeridas as $valor) {
+            array_key_exists($valor, $layoutDados)
+                ? null
+                : throw new \InvalidArgumentException("Colunas obrigatória ausente: {$valor}");
+        }
+    }
+
+    private function validarMaquinas(array $maquinas): void
+    {
+        $colunasRequeridas = ['fk_id_machine'];
+
+        foreach ($colunasRequeridas as $valor) {
+            array_key_exists($valor, $maquinas)
+                ? null
+                : throw new \InvalidArgumentException("Colunas obrigatória ausente: {$valor}");
+        }
     }
 }
