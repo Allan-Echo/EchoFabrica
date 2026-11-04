@@ -102,7 +102,7 @@ class EasyPDO
             $str,
             $this->db_user,
             $this->db_pass,
-            [PDO::ATTR_PERSISTENT => true]
+            [PDO::ATTR_PERSISTENT => false]
         );
 
         // --------------------------------------------------------------------
@@ -163,8 +163,6 @@ class EasyPDO
         //affected rows
         $this->affectedRows = $command->rowCount();
 
-        //close connection
-        $this->connection = null;
 
         //returns results
         return $results;
@@ -198,8 +196,6 @@ class EasyPDO
         //affected rows
         $this->affectedRows = $command->rowCount();
 
-        //close connection
-        $this->connection = null;
     }
 
     // ========================================================================
@@ -230,8 +226,6 @@ class EasyPDO
         //affected rows
         $this->affectedRows = $command->rowCount();
 
-        //close connection
-        $this->connection = null;
     }
 
     // ========================================================================
@@ -262,8 +256,6 @@ class EasyPDO
         //affected rows
         $this->affectedRows = $command->rowCount();
 
-        //close connection
-        $this->connection = null;
     }
 
     // ========================================================================
@@ -294,8 +286,6 @@ class EasyPDO
         //affected rows
         $this->affectedRows = $command->rowCount();
 
-        //close connection
-        $this->connection = null;
     }
 
     // ========================================================================
@@ -393,9 +383,17 @@ class EasyPDO
             //affected rows
             $this->affectedRows = $command->rowCount();
 
-            //close connection
-            $this->connection = null;
+            $str = "mysql:host={$this->db_host};port=3307;dbname={$this->db_name};charset={$this->db_char}";
+
+            $this->connection = new PDO(
+                $str,
+                $this->db_user,
+                $this->db_pass,
+                [PDO::ATTR_PERSISTENT => false]
+            );
         }
+
+        return $this->connection;
     }
 
     // ========================================================================
@@ -454,8 +452,6 @@ class EasyPDO
             throw $e;
         }
 
-        //close connection
-        $this->connection = null;
     }
     // ========================================================================
     // Extra Methods PDO
@@ -482,7 +478,7 @@ class EasyPDO
             $lastId = $this->connection->lastInsertId();
             $lastId = $lastId !== false ? (int) $lastId : false;
 
-            $this->connection = null;
+
             $this->affectedRows = $command->rowCount();
 
             return $lastId;
@@ -515,7 +511,7 @@ class EasyPDO
                     $colunaDependente => $valorId]);
             }
             $this->connection->commit();
-            $this->connection = null;
+
             return $primaryId;
         } catch (\Throwable $e) {
             if ($this->connection->inTransaction()) {
@@ -535,7 +531,7 @@ class EasyPDO
                 $stmt->execute($params);
             }
             $this->connection->commit();
-            $this->connection = null;
+
         } catch (\Throwable $e) {
             if ($this->connection->inTransaction()) {
                 $this->connection->rollBack();
@@ -554,7 +550,7 @@ class EasyPDO
 
             $this->connection->commit();
 
-            $this->connection = null;
+
 
             return $resultado;
 
