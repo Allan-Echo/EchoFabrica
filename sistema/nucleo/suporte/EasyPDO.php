@@ -382,6 +382,29 @@ class EasyPDO
 
             //affected rows
             $this->affectedRows = $command->rowCount();
+        }
+    }
+
+    // ========================================================================
+    // Controles de Conexão
+    // ========================================================================
+
+    public function closeConnection(): void
+    {
+        $this->connection = null;
+        $this->command = null;
+    }
+
+    // ========================================================================
+    public function __destruct()
+    {
+        $this->closeConnection();
+    }
+
+    // ========================================================================
+    private function getConnection(): PDO
+    {
+        if ($this->connection === null) {
 
             $str = "mysql:host={$this->db_host};port=3307;dbname={$this->db_name};charset={$this->db_char}";
 
@@ -397,6 +420,9 @@ class EasyPDO
     }
 
     // ========================================================================
+    // Erro e Drivers
+    // ========================================================================
+
     public function availableDrivers()
     {
         // outputs the available PDO drivers
