@@ -93,7 +93,8 @@ class LayoutMaquina extends Modelo
         return $this;
     }
 
-    public function removerMaquina(int $maquinaId): true // refatorar pra retirar true e por a instacia
+    // refatorar pra trocar true pela instancia e verificar se é melhor tudo em transaction
+    public function removerMaquina(int $maquinaId): true
     {
         $this->verificarExistenciaMaquina($maquinaId);
 
@@ -111,7 +112,7 @@ class LayoutMaquina extends Modelo
                     $this->softDeleteVinculosDosLayouts($layoutsAfetadosIds);
                     $this->softDeleteLayouts($layoutsAfetadosIds);
 
-                    $this->recriarLayoutsEVinculos($layoutsAtualizados);
+                    $this->recriarLayoutsEVinculos($layoutsAtualizados); // analisar melhor IMPORTANTE
 
                     return true;
                 }
@@ -136,7 +137,7 @@ class LayoutMaquina extends Modelo
 
     private function existeAssociacao(int $maquinaId): bool
     {
-        $selectQuery = "SELECT fk_id_machine FROM layout_machine WHERE fk_id_machine =:id AND deleted_at IS NULL";
+        $selectQuery = "SELECT fk_id_machine FROM layout_machine WHERE fk_id_machine = :id AND deleted_at IS NULL";
 
         $registro = $this->conection->select($selectQuery, ['id' => $maquinaId]);
 
@@ -181,7 +182,7 @@ class LayoutMaquina extends Modelo
     {
         $layoutsIds =  implode(',', $layoutsAfetadosIds);
 
-        $selectQuery = "SELECT * FROM wv_layout_ativos WHERE fk_id_layout IN ($layoutsIds)";
+        $selectQuery = "SELECT * FROM vw_layouts_ativos WHERE fk_id_layout IN ($layoutsIds)";
 
         return $this->conection->select($selectQuery);
     }
@@ -219,7 +220,7 @@ class LayoutMaquina extends Modelo
 
             $this->validarLayout($layoutDados);
 
-            $insertQueryLayout = $this->prepararCadastro($layoutDados)->obterQuery();
+            $insertQueryLayout = $this->prepararCadastro($layoutDados, 'layout')->obterQuery();
             $layoutId = $this->conection->insertComUltimoId($insertQueryLayout, $layoutDados);
 
             $maquinas = array_filter(
