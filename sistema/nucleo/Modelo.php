@@ -313,15 +313,19 @@ abstract class Modelo
         }
     }
 
-    protected function prepararCadastro(?array $dados = null): static
+    protected function prepararCadastro(?array $dados = null, ?string $tabela = null): static
     {
         if ($dados === null) {
             $dados = $this->dadosComoArray();
         }
 
+        if ($tabela === null) {
+            $tabela = $this->tabela;
+        }
+
         $colunas = implode(', ', array_keys($dados));
         $valores = ':' . implode(', :', array_keys($dados));
-        $this->query = "INSERT INTO {$this->tabela} ({$colunas}) VALUES ({$valores})";
+        $this->query = "INSERT INTO {$tabela} ({$colunas}) VALUES ({$valores})";
         return $this;
     }
 
