@@ -249,21 +249,20 @@ class LayoutMaquina extends Modelo
     {
         $colunasRequeridas = ['denomination', 'observation'];
 
-        foreach ($colunasRequeridas as $valor) {
-            array_key_exists($valor, $layoutDados)
+        foreach ($colunasRequeridas as $coluna) {
+            array_key_exists($coluna, $layoutDados)
                 ? null
-                : throw new \InvalidArgumentException("Colunas obrigatória ausente: {$valor}");
+                : throw new \InvalidArgumentException("Colunas obrigatória ausente: {$coluna}");
         }
     }
 
     private function validarMaquinas(array $maquinas): void
     {
-        $colunasRequeridas = ['fk_id_machine'];
-
-        foreach ($colunasRequeridas as $valor) {
-            array_key_exists($valor, $maquinas)
-                ? null
-                : throw new \InvalidArgumentException("Colunas obrigatória ausente: {$valor}");
+        if (
+            !isset($maquinas['fk_id_machine']) ||
+            $maquinas['fk_id_machine'] === ''
+        ) {
+            throw new \InvalidArgumentException("Nenhuma máquina encontrada");
         }
     }
 }
